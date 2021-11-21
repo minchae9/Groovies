@@ -128,15 +128,17 @@ def search(request):
 def recommendation(request):
     movie_list = Rating.objects.filter(user=request.user.pk, rate__gte=4)
     result = Similar.objects.none()  # 빈 쿼리셋
-    if movie_list:
+    if movie_list and request.user.is_authenticated:
         for movie in movie_list:
             # movies_similar 테이블에서 original_movie로 필터링 후
             similar_movies = Similar.objects.filter(original_movie=movie.movie_id)
             # 목록에 추가
-            result = result | similar_movies
-        serializer = MovieListSerializer(result, many=True)
-        return Response(serializer.data)
-    return Response({'message': '추천을 받으려면 영화에 평점을 더 남겨주세요.'})
+            result = result | similar_movies   
+    else:
+        result = Movie.objects.all()
+    serializer = MovieListSerializer(result, many=True)
+    return Response(serializer.data)
+    # return Response({'message': '추천을 받으려면 영화에 평점을 더 남겨주세요.'})
 
 
 @api_view(['POST'])

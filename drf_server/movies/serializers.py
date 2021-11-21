@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Actor, Director, Movie, Comment, Rating, Similar
 
 class MovieListSerializer(serializers.ModelSerializer):
-
+    
     class Meta:
         model = Movie
         fields = ('id', 'title', 'adult', 'poster_path')

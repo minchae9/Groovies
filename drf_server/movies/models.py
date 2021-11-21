@@ -1,13 +1,13 @@
 from django.db import models
 from django.conf import settings
 from django.db.models.deletion import CASCADE
+from django.contrib.postgres.fields import ArrayField
+from django.db.models.fields import CharField
 
-# class Genre(models.Model):
-#     name = models.CharField(max_length=50)
 
 class Movie(models.Model):
     adult = models.BooleanField()
-    genres = models.TextField()
+    genres = models.CharField(max_length=30)
     title = models.CharField(max_length=100)
     original_title = models.CharField(max_length=150)
     tagline = models.CharField(max_length=100, blank=True)

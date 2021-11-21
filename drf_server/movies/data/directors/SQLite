@@ -1,7 +1,0 @@
-CREATE TABLE movies_director(
-  id INTEGER PRIMARY KEY,
-  name TEXT NOT NULL,
-  profile_path TEXT,
-  movie_id INTEGER NOT NULL,
-  FOREIGN KEY(movie_id) REFERENCES movies_movie(id)
-);

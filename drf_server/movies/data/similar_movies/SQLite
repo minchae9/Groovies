@@ -1,7 +1,0 @@
-CREATE TABLE movies_similar(
-  id INTEGER PRIMARY KEY,
-  title TEXT NOT NULL,
-  poster_path TEXT,
-  original_movie INTEGER NOT NULL,
-  FOREIGN KEY(original_movie) REFERENCES movies_movie(id)
-);
