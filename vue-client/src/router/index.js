@@ -9,11 +9,12 @@ import Login from '@/views/TheLogin.vue'
 import MovieDetail from '@/views/TheMovieDetail.vue'
 import UserProfile from '@/views/TheUserProfile.vue'
 
+
 Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/movies',
+    path: '/',
     name: 'Home',
     component: Home
   },
@@ -29,7 +30,7 @@ const routes = [
   },
   {
     // path: '/search/:searchKeyword',
-    path: '/movies/search',
+    path: '/movies/search/',
     name: 'Search',
     component: Search
   },
@@ -60,6 +61,13 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes,
 })
+
+const originalPush = VueRouter.prototype.push;
+VueRouter.prototype.push = function push(location) {
+	return originalPush.call(this, location).catch(err => {
+		if (err.name !== 'NavigationDuplicated') throw err;
+	});
+};
 
 
 export default router

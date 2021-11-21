@@ -5,8 +5,6 @@ from rest_framework.decorators import api_view
 from django.shortcuts import get_list_or_404, get_object_or_404
 from movies.serializers import MovieListSerializer, MovieSerializer, CommentSerializer, RatingSerializer, ActorSerializer, DirectorSerializer, SimilarSerializer
 from .models import Comment, Rating, Movie, Similar, Cart
-# 검색
-from .filters import MovieSearchFilter
 
 
 # 전체 댓글      
@@ -113,14 +111,16 @@ def rating(request, movie_pk):
 
 # 검색
 @api_view(['GET'])
-def search(request):
-    keyword = request.GET['keyword']
-    search_list1 = Movie.objects.filter(title__contains=keyword)
-    search_list2 = Movie.objects.filter(original_title__contains=keyword)
-    search_list3 = Movie.objects.filter(genres__contains=keyword)
-    search_list = search_list1 | search_list2 | search_list3
-    serializer = MovieListSerializer(search_list, many=True)
-    return Response(serializer.data)
+def search(request, keyword):
+    # keyword = request.GET.get('searchKeyword')
+    if keyword:
+        search_list1 = Movie.objects.filter(title__contains=keyword)
+        search_list2 = Movie.objects.filter(original_title__contains=keyword)
+        search_list3 = Movie.objects.filter(genres__contains=keyword)
+        search_list = search_list1 | search_list2 | search_list3
+        serializer = MovieListSerializer(search_list, many=True)
+        return Response(serializer.data)
+    return Response({'error': 'No keyword.'})
 
 
 # 추천

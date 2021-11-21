@@ -4,8 +4,8 @@
         class="search-bar"
         placeholder="검색어를 입력하세요" 
         :value="searchKeyword" @input="updateInput" 
-        @keypress.enter="onSearch">
-      <button @click="onSearch" class="search-button">
+        @keypress.enter="onSearch(searchKeyword)">
+      <button @click="onSearch(searchKeyword)" class="search-button">
           <img src="@/assets/search.png" class="search-icon">
       </button>
   </div>
@@ -21,10 +21,10 @@ export default {
         }
     },
     methods: {
-        onSearch: function () {
-            console.log('onSearch!')
-            if (this.searchKeyword) {
-                this.$store.dispatch('onSearch', this.searchKeyword)
+        onSearch: function (searchKeyword) {
+            // console.log('onSearch!')
+            if (searchKeyword) {
+                this.$store.dispatch('onSearch', searchKeyword)
                 if (this.$route.path !== '/search') {
                     this.$router.push({ name: 'Search' })
                 }

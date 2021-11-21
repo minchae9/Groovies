@@ -72,10 +72,10 @@ export default {
         'selectedMovie'
       ]),
       trailer_src: function () {
-        return `https://www.youtube.com/embed/${this.selectedMovie.trailer_key}`
+        return this.selectedMovie.trailer_key ? `https://www.youtube.com/embed/${this.selectedMovie.trailer_key}`: ''
       },
       poster_path: function () {
-        return `https://image.tmdb.org/t/p/w185/${this.selectedMovie.poster_path}`
+        return this.selectedMovie.poster_path ? `https://image.tmdb.org/t/p/original/${this.selectedMovie.poster_path}`: ''
       }
     },
 }

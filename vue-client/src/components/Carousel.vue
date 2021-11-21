@@ -9,34 +9,34 @@
         <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="4" aria-label="Slide 5"></button>
       </div>
       <div class="carousel-inner">
-        <div class="carousel-item active">
+        <div class="carousel-item active" v-if="carouselItems">
           <img :src=getPosterPath(carouselItems[0]) class="d-block w-100" alt="poster image">
           <div class="carousel-caption d-none d-md-block">
-            <h5>{{ carouselItems[0].title }}</h5>
+            <h5 v-if="carouselItems[0]">{{ carouselItems[0].title }}</h5>
             <p></p>
             <button @click="openModal(0)" data-bs-toggle="modal" data-bs-target="#staticBackdrop">상세정보</button>
           </div>
         </div>
-        <div class="carousel-item">
+        <div class="carousel-item" v-if="carouselItems">
           <img :src=getPosterPath(carouselItems[1]) class="d-block w-100" alt="poster image">
           <div class="carousel-caption d-none d-md-block">
-            <h5>{{ carouselItems[1].title }}</h5>
+            <h5 v-if="carouselItems[1]">{{ carouselItems[1].title }}</h5>
             <p></p>
             <button @click="openModal(1)" data-bs-toggle="modal" data-bs-target="#staticBackdrop">상세정보</button>
           </div>
         </div>
-        <div class="carousel-item">
+        <div class="carousel-item" v-if="carouselItems">
           <img :src=getPosterPath(carouselItems[2]) class="d-block w-100" alt="poster image">
           <div class="carousel-caption d-none d-md-block">
-            <h5>{{ carouselItems[2].title }}</h5>
+            <h5 v-if="carouselItems[2]">{{ carouselItems[2].title }}</h5>
             <p></p>
             <button @click="openModal(2)" data-bs-toggle="modal" data-bs-target="#staticBackdrop">상세정보</button>
           </div>
         </div>
-        <div class="carousel-item">
+        <div class="carousel-item" v-if="carouselItems">
           <img :src=getPosterPath(carouselItems[3]) class="d-block w-100" alt="poster image">
           <div class="carousel-caption d-none d-md-block">
-            <h5>{{ carouselItems[3].title }}</h5>
+            <h5 v-if="carouselItems[3]">{{ carouselItems[3].title }}</h5>
             <p></p>
             <button @click="openModal(3)" data-bs-toggle="modal" data-bs-target="#staticBackdrop">상세정보</button>
           </div>
@@ -44,7 +44,7 @@
         <div class="carousel-item">
           <img :src=getPosterPath(carouselItems[4]) class="d-block w-100" alt="poster image">
           <div class="carousel-caption d-none d-md-block">
-            <h5>{{ carouselItems[4].title }}</h5>
+            <h5 v-if="carouselItems[4]">{{ carouselItems[4].title }}</h5>
             <p></p>
             <button @click="openModal(4)" data-bs-toggle="modal" data-bs-target="#staticBackdrop">상세정보</button>
           </div>
@@ -79,13 +79,15 @@ export default {
         this.$store.dispatch('getMovieDetail', this.carouselItems[num].id)
       },
       getPosterPath: function (carouselItem) {
-        return `https://image.tmdb.org/t/p/w185/${carouselItem.poster_path}`
-      },
+        if (carouselItem) {
+          return `https://image.tmdb.org/t/p/original/${carouselItem.poster_path}`
+        } 
+      }         
     },
     computed: {
-        carouselItems: function () {
-            return _.sampleSize(this.movieItems, 5)
-        },
+      carouselItems: function () {
+          return _.sampleSize(this.movieItems, 5)
+      },
     },
 }
 </script>

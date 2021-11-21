@@ -12,6 +12,6 @@ urlpatterns = [
     path('<int:movie_pk>/comment/<int:comment_pk>/like/', views.comment_like),    
     path('<int:movie_pk>/rating/', views.rating),   # user의 rating
     path('<int:movie_pk>/cart/', views.add_cart, name='add_cart'),  # 찜하기
-    path('search/', views.search, name='search'), # 검색 결과 반환
+    path('search/<str:keyword>/', views.search, name='search'), # 검색 결과 반환
     path('recommendation/', views.recommendation, name='recommendation'),   # 추천영화 목록 반환
 ]
