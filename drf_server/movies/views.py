@@ -136,7 +136,7 @@ def recommendation(request):
             result = result | similar_movies   
     else:
         result = Movie.objects.all()
-    serializer = MovieListSerializer(result, many=True)
+    serializer = MovieSerializer(result, many=True)
     return Response(serializer.data)
     # return Response({'message': '추천을 받으려면 영화에 평점을 더 남겨주세요.'})
 

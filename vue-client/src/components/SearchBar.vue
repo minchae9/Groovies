@@ -2,7 +2,7 @@
   <div id="searchBar">
       <input type="text" id="SearchInput" 
         class="search-bar"
-        placeholder="검색어를 입력하세요" 
+        placeholder="검색어를 입력하십시오" 
         :value="searchKeyword" @input="updateInput" 
         @keypress.enter="onSearch(searchKeyword)">
       <button @click="onSearch(searchKeyword)" class="search-button">
@@ -32,14 +32,13 @@ export default {
         },
         updateInput: function(event) {
             this.searchKeyword = event.target.value
-        }
+        },
     },
     created: function () {
         if (this.$route.path === '/search') {
             this.searchKeyword = this.$store.state.searchKeyword
         }
     },
-    
 }
 </script>
 

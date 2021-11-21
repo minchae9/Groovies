@@ -1,27 +1,33 @@
 <template>
   <div id="community">
-    <ul id="article-list">
+    <ul id="article-list" v-if="articleList">
       <li class="article-list-item" v-for="(articleListItem, index) in articleList" :key="index">
         <span class="article-list-item-title" 
         @click="moveToArticle(articleListItem.id)">
-        {{ articleListItem.title }}</span>
+        {{ articleList ? articleListItem.title : null }}</span>
         <span class="article-list-item-user" 
         @click="moveToUserProfile(articleListItem.user.user_id)">
-          {{ articleListItem.user.username }}</span>
-        <span>{{ articleListItem.created_at }}</span>
+          {{ articleList ? articleListItem.user.username : null }}</span>
+        <span>{{ articleList ? articleListItem.created_at : null }}</span>
       </li>
       <!-- list -->
     </ul>
+    <div v-else>
+      <h2>첫 게시글을 남겨주세요.</h2>
+      <button>작성</button>
+    </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
     name: 'Community',
     data: function () {
-        return {
-          articleList: [],
-        }
+      return {
+        articleList: null,
+      }
     },
     methods: {
       moveToArticle: function (article_id) {
@@ -33,47 +39,16 @@ export default {
     },
     created: function () {
       //axios
-
-      const temp_result = [
-        {
-          id: '1',
-          title: '이 영화 재미없어요',
-          user: {
-            user_id: 1,
-            username: 'une9',
-          },
-          created_at: '2021-11-21'
-        },
-        {
-          id: '2',
-          title: '인생작입니다.',
-          user: {
-            user_id: 2,
-            username: 'abcd',
-          },
-          created_at: '2021-09-01'
-        },
-        {
-          id: '3',
-          title: '꼭 보세요',
-          user: {
-            user_id: 1,
-            username: 'une9',
-          },
-          created_at: '2021-10-30'
-        },
-        {
-          id: '4',
-          title: 'ㅇㅇㅇ감독 새 영화 나온다는데 보실건가요?',
-          user: {
-            user_id: 3,
-            username: 'happy',
-          },
-          created_at: '2021-11-01'
-        },
-      ]
-
-      this.articleList = temp_result
+      axios({
+        method: 'get',
+        url: 'http://127.0.0.1:8000/community/'
+      })
+        .then (res => {
+          this.articleList = res.data         
+        })
+        .catch (err => {
+          console.log(err.response)
+        })
     }
 }
 </script>

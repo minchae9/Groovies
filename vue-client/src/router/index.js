@@ -30,7 +30,7 @@ const routes = [
   },
   {
     // path: '/search/:searchKeyword',
-    path: '/movies/search/',
+    path: '/movies/search',
     name: 'Search',
     component: Search
   },
