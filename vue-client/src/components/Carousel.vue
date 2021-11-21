@@ -10,43 +10,43 @@
       </div>
       <div class="carousel-inner">
         <div class="carousel-item active">
-          <img src="https://24wallpapers.com/app-gateway/wallpaper-uploads/wallpapers/legacyUploads/wi2165da692f6-a82c-4a84-a372-0b089b41fa09868962133.jpg" class="d-block w-100" alt="...">
+          <img :src=getPosterPath(carouselItems[0]) class="d-block w-100" alt="poster image">
           <div class="carousel-caption d-none d-md-block">
-            <h5>First slide label</h5>
-            <p>Some representative placeholder content for the first slide.</p>
-            <button @click="openModal">상세정보</button>
+            <h5>{{ carouselItems[0].title }}</h5>
+            <p></p>
+            <button @click="openModal(0)" data-bs-toggle="modal" data-bs-target="#staticBackdrop">상세정보</button>
           </div>
         </div>
         <div class="carousel-item">
-          <img src="https://mblogthumb-phinf.pstatic.net/MjAxNzEyMTdfMTgg/MDAxNTEzNDk1MzkxMDcz.9QowjBcPhoH49YnxJRnoLe_7HUKYlqtRzrTu2gH6JiEg.E-Uw7LGpsZuyY0OUAPhD4frvXbv6Fq-KoqTc4K2XaxYg.JPEG.epik7777/aesthetic-bambi-dark-dark-purple-Favim.com-3838997.jpg?type=w800" class="d-block w-100" alt="...">
+          <img :src=getPosterPath(carouselItems[1]) class="d-block w-100" alt="poster image">
           <div class="carousel-caption d-none d-md-block">
-            <h5>Second slide label</h5>
-            <p>Some representative placeholder content for the second slide.</p>
-            <button @click="openModal">상세정보</button>
+            <h5>{{ carouselItems[1].title }}</h5>
+            <p></p>
+            <button @click="openModal(1)" data-bs-toggle="modal" data-bs-target="#staticBackdrop">상세정보</button>
           </div>
         </div>
         <div class="carousel-item">
-          <img src="https://i.pinimg.com/736x/06/80/93/06809351224cf53ebcd1ec649572e48d.jpg" class="d-block w-100" alt="...">
+          <img :src=getPosterPath(carouselItems[2]) class="d-block w-100" alt="poster image">
           <div class="carousel-caption d-none d-md-block">
-            <h5>Third slide label</h5>
-            <p>Some representative placeholder content for the third slide.</p>
-            <button @click="openModal">상세정보</button>
+            <h5>{{ carouselItems[2].title }}</h5>
+            <p></p>
+            <button @click="openModal(2)" data-bs-toggle="modal" data-bs-target="#staticBackdrop">상세정보</button>
           </div>
         </div>
         <div class="carousel-item">
-          <img src="https://64.media.tumblr.com/0c051e203cbc69d709e67effb12fe14c/946ec8b1de5337a5-45/s1280x1920/89ef0ac0ea4a965a50ebc25d4715c3af204ec9ad.jpg" class="d-block w-100" alt="...">
+          <img :src=getPosterPath(carouselItems[3]) class="d-block w-100" alt="poster image">
           <div class="carousel-caption d-none d-md-block">
-            <h5>Fourth slide label</h5>
-            <p>Some representative placeholder content for the Fourth slide.</p>
-            <button @click="openModal">상세정보</button>
+            <h5>{{ carouselItems[3].title }}</h5>
+            <p></p>
+            <button @click="openModal(3)" data-bs-toggle="modal" data-bs-target="#staticBackdrop">상세정보</button>
           </div>
         </div>
         <div class="carousel-item">
-          <img src="https://wallpaper.dog/large/17133733.jpg" class="d-block w-100" alt="...">
+          <img :src=getPosterPath(carouselItems[4]) class="d-block w-100" alt="poster image">
           <div class="carousel-caption d-none d-md-block">
-            <h5>Fifth slide label</h5>
-            <p>Some representative placeholder content for the fifth slide.</p>
-            <button @click="openModal">상세정보</button>
+            <h5>{{ carouselItems[4].title }}</h5>
+            <p></p>
+            <button @click="openModal(4)" data-bs-toggle="modal" data-bs-target="#staticBackdrop">상세정보</button>
           </div>
         </div>
       </div>
@@ -63,17 +63,29 @@
 </template>
 
 <script>
+import _ from 'lodash'
+
 export default {
     name: 'Carousel',
+    props: {
+      movieItems: Array,
+    },
     data: function () {
         return {
-
         }
     },
     methods: {
-      openModal: function () {
-        
-      }
+      openModal: function (num) {
+        this.$store.dispatch('getMovieDetail', this.carouselItems[num].id)
+      },
+      getPosterPath: function (carouselItem) {
+        return `https://image.tmdb.org/t/p/w185/${carouselItem.poster_path}`
+      },
+    },
+    computed: {
+        carouselItems: function () {
+            return _.sampleSize(this.movieItems, 5)
+        },
     },
 }
 </script>

@@ -1,6 +1,6 @@
 <template>
   <div>
-      <carousel id="carousel"></carousel>
+      <carousel id="carousel" :movieItems="movieItems"></carousel>
       <search-bar id="home-search-bar"></search-bar>
       <movie-list :movieItems="movieItems"></movie-list>
   </div>
