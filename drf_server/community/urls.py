@@ -1,0 +1,13 @@
+from django.urls import path
+from . import views
+
+app_name = "community"
+
+urlpatterns = [
+    path('article/', views.article_list, name='article_list'),
+    path('article/<int:article_pk>/', views.article_detail, name='article_detail'),
+    path('article/<int:article_pk>/like/', views.article_like, name='article_like'),
+    path('article/<int:article_pk>/comment/', views.comment_list, name='comment_list'),
+    path('article/<int:article_pk>/comment/<int:comment_pk>/', views.comment_detail, name='comment_detail'),
+    path('article/<int:article_pk>/comment/create/', views.comment_create, name='comment_create'),
+]
