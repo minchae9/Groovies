@@ -12,6 +12,8 @@
           <div>
             <p>작성  |  {{ article.created_at | convertFormat }}</p>
             <p>수정  |  {{ article.updated_at | convertFormat }}</p>
+            <button @click="updateArticle(article)" v-if="article.user === userInfo.user_id">수정</button>
+            <button @click="deleteArticle(article)" v-if="article.user === userInfo.user_id">삭제</button>
           </div>
         </div>
         <div id="article-content-box">
@@ -31,7 +33,7 @@
 
       <div id="article-comments-box">
         <div id="article-comment-title">댓글</div>
-        <ul id="article-comments" v-if="comments==[]">
+        <ul id="article-comments" v-if="comments">
           <li class="article-comment" v-for="(comment, index) in comments" :key="index">
             <div>
               <img :src="require(`@/assets/profile_img_${comment.profile_path}.jpg`)" 
@@ -40,17 +42,21 @@
             <div class="comment-username">{{ comment.username }}</div>
             <div class="comment-content">{{ comment.content }}</div>
             <div class="comment-created-at">{{ comment.created_at | convertFormat }}</div>
+            <button @click="deleteComment(comment)" v-if="comment.user === userInfo.user_id">삭제</button>
           </li>
         </ul>
         <div v-else>
-          첫 댓글을 작성해보세요!
+          첫 댓글을 남겨보세요!
         </div>
         <br>
       </div>
 
       <div id="comment-input-box">
-        <textarea id="comment-input" placeholder="댓글을 입력해주세요 :)"
-        :commentInput="commentInput" @input="onCommentInput"
+        <textarea v-if="login" id="comment-input" placeholder="댓글을 입력해주세요 :)"
+        :commentInput="commentInput" @input="onCommentInput" @keypress.enter="createComment"
+        ></textarea>
+        <textarea v-else id="comment-input" placeholder="로그인 후 이용 가능한 기능입니다."
+        :commentInput="commentInput" @input="onCommentInput" @keypress.enter="createComment"
         ></textarea>
         <button id="comment-button" @click="createComment" class="btn btn-primary">작성</button>
       </div>
@@ -64,9 +70,6 @@ import axios from 'axios'
 
 export default {
     name: 'CommunityArticle',
-    props: {
-      login: Boolean,
-    },
     data: function () {
       return {
         article: {},
@@ -82,26 +85,18 @@ export default {
       },
       createComment: function () {
         if (this.commentInput) {
-          // axios
-          // console.log('댓글 작성!: ', this.commentInput)
-          // axios({
-          //   method: 'post',
-          //   url: `http://127.0.0.1:8000/${this.article.id}/comment/create/`,
-          //   data: { comment: {
-          //     content : this.commentInput,
-          //     article_id: this.article.id,
-          //     user_id: 
-          //   }}
-          // })
-          //   .then(res => {
-          //     console.log(res)
-          //   })
-          //   .catch(err => {
-          //     console.log(err)
-          //   })
-          
-
-          // comments에 작성 댓글 추가
+          axios({
+            method: 'post',
+            url: `http://127.0.0.1:8000/community/${this.article.id}/comment/create/`,
+            data: { content: this.commentInput },
+            headers: { Authorization : `JWT ${localStorage.getItem('jwt')}`}
+          })
+            .then(() => {
+              this.$router.go()
+            })
+            .catch(() => {
+              console.log(this.commentInput)
+            })
 
           // reset commentInput
           this.commentInput = ''
@@ -110,25 +105,57 @@ export default {
         }
       },
       toggleLike: function () {
-        if (this.login) {
+        // 좋아요 정보 저장하기
+        axios({
+          method: 'post',
+          url: `http://127.0.0.1:8000/community/${this.article.id}/like/`,
+          headers: { Authorization : `JWT ${localStorage.getItem('jwt')}`}
+        })
+          .catch(err => {
+            console.log(err)
+          })
+        // 하트와 좋아요 수 변경
+        if (localStorage.getItem('jwt')) {
           if (this.isLikeUser) {
-          // 좋아요 취소
-          // axios
-          console.log('좋아요 취소')
           this.isLikeUser = false
           if (this.likeUsersCount > 0) {
             this.likeUsersCount--
             }
           } else {
-            // 좋아요 누르기
-            // axios
-            console.log('좋아요 누르기')
             this.isLikeUser = true
             this.likeUsersCount++
           }
         }
-        
-      }
+      },
+      deleteComment: function (comment) {
+        axios({
+          method: 'delete',
+          url: `http://127.0.0.1:8000/community/${this.article.id}/comment/${comment.id}/`,
+          headers: { Authorization : `JWT ${localStorage.getItem('jwt')}`}
+        })
+          .then(() => {
+            this.$router.go()
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      },
+      // updateArticle: function (article) {
+
+      // },
+      deleteArticle: function (article) {
+        axios({
+          method: 'delete',
+          url: `http://127.0.0.1:8000/community/${article.id}/`,
+          headers: { Authorization : `JWT ${localStorage.getItem('jwt')}`}
+        })
+          .then(() => {
+            this.$router.push({ name: 'Community' })
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      },
     },
     created: function () {
       const article_id = this.$route.params.article_id
@@ -139,9 +166,9 @@ export default {
         url: `http://127.0.0.1:8000/community/${article_id}`
       })
         .then(res => {
-          // console.log(res)
+          // console.log(res.data)
           this.article = res.data
-          this.likeUsersCount = res.data.like_article_users | length
+          this.likeUsersCount = res.data.like_article_users.length
         })
         .catch(err => {
           console.log(err)
@@ -158,13 +185,21 @@ export default {
         })
         .catch(err => {
           console.log(err)
-        })      
+        })  
     },
     filters: {
       convertFormat: function (string) {
         return string? `${string.slice(0,4)}년 ${string.slice(5,7)}월 ${string.slice(8,10)}일 ${string.slice(11,16)}` : ''
       }
     },
+    computed: {
+      login: function () {
+        return (this.$store.state.loginUser != null)
+      },
+      userInfo: function () {
+        return this.$store.state.loginUser
+      }
+    }
 }
 </script>
 

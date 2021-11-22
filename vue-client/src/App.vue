@@ -4,7 +4,7 @@
       <div>
         <router-link :to="{ name: 'Home' }"><img src="@/assets/logo.png" alt="logo" class="mainlogo"></router-link> |
         <router-link :to="{ name: 'Search' }">영화 검색</router-link> |
-        <router-link :to="{ name: 'Community' }" :login="login">커뮤니티</router-link>
+        <router-link :to="{ name: 'Community' }">커뮤니티</router-link>
       </div>
       <div v-if="!login">
         <router-link :to="{ name: 'Signup' }">회원가입</router-link> |
@@ -52,6 +52,7 @@ export default {
       const base64Payload = JWTtoken.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE 
       const payload = Buffer.from(base64Payload, 'base64'); 
       const result = JSON.parse(payload.toString()) 
+      // console.log(result)
       this.userInfo.user_id = result.user_id
       this.userInfo.username = result.username
       // console.log(this.userInfo)
