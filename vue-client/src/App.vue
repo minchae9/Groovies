@@ -46,15 +46,17 @@ export default {
     },
     // 현재 로그인한 유저 정보 받기
     getUserInfo: function () {
-      // 유저 정보 추출
+      if (localStorage.getItem('jwt')) {
+        // 유저 정보 추출
       const JWTtoken = localStorage.getItem('jwt')
-      var base64Payload = JWTtoken.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE 
-      var payload = Buffer.from(base64Payload, 'base64'); 
-      var result = JSON.parse(payload.toString()) 
+      const base64Payload = JWTtoken.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE 
+      const payload = Buffer.from(base64Payload, 'base64'); 
+      const result = JSON.parse(payload.toString()) 
       this.userInfo.user_id = result.user_id
       this.userInfo.username = result.username
       // console.log(this.userInfo)
-      this.$store.dispatch('storeLoginUser', this.userInfo)    
+      this.$store.dispatch('storeLoginUser', this.userInfo)
+      }    
     },
   },
   created: function () {

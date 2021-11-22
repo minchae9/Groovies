@@ -38,7 +38,7 @@ export default {
         }
     },
     created: function () {
-        console.log('created searchbar')
+        // console.log('created searchbar')
         if (/^\/search\//.test(this.$route.path)) {
             // console.log('if created')
             this.searchKeyword = this.$store.state.searchKeyword
