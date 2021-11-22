@@ -128,3 +128,12 @@ def my_articles(request):
             return Response(serializers.data)
         return Response({'message': '커뮤니티에 첫 게시글을 남겨주세요!'})
     return Response({'error': '로그인이 필요한 기능입니다.'})
+
+
+@api_view(['GET'])
+def profile(request, profile_id):
+    if request.user.is_authenticated:
+        user = get_user_model().objects.filter(username=profile_id)
+        serializer = UserSerializer(user)
+        return Response(serializer.data)
+    return Response({'error': '로그인이 필요한 기능입니다.'})

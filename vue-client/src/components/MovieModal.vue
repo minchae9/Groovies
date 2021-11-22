@@ -21,7 +21,7 @@
           <iframe :src="trailer_src" title="YouTube video player" frameborder="0" 
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
           allowfullscreen></iframe>
-          <div class="movie-info"> 
+          <div class="movie-info">
             <img :src="poster_path" :alt="selectedMovie.title" class="poster">
             <div v-if="selectedMovie.overview">
               <h6>줄거리</h6>
@@ -61,7 +61,7 @@ export default {
       convertToTime: function (num) {
         const hour = parseInt(num / 60)
         const minute = num % 60
-        return `${hour}시간 ${minute}분`
+        return num ? `${hour}시간 ${minute}분` : ''
       },
       getYear: function (string) {
         return string ? string.slice(0,4) : ''

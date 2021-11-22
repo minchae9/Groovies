@@ -1,8 +1,8 @@
 <template>
   <div>
-      <carousel id="carousel" :movieItems="movieItems"></carousel>
-      <search-bar id="home-search-bar"></search-bar>
-      <movie-list :movieItems="movieItems"></movie-list>
+    <carousel id="carousel" :movieItems="carousel_items"></carousel>
+    <search-bar id="home-search-bar"></search-bar>
+    <movie-list :movieItems="recommendations"></movie-list>
   </div>
 </template>
 
@@ -11,7 +11,7 @@ import Carousel from '../components/Carousel.vue'
 import SearchBar from '../components/SearchBar.vue'
 import MovieList from '../components/MovieList.vue'
 import axios from 'axios'
-import _ from 'lodash'
+// import _ from 'lodash'
 
 export default {
     components: { 
@@ -22,7 +22,8 @@ export default {
     name: 'Home',
     data: function () {
         return {
-            movieItems: [],
+            recommendations: [],
+            carousel_items: [],
         }
     },
     methods: {
@@ -36,9 +37,9 @@ export default {
             url: 'http://127.0.0.1:8000/movies/recommendation'
         })
             .then(res => {
-                const movies = _.sampleSize(res.data, 15)
-                // console.log(movies)
-                this.movieItems = movies
+                // console.log(res)
+                this.recommendations = res.data.recommendations
+                this.carousel_items = res.data.carousel_items
             })
             .catch(err => {
                 console.log(err)

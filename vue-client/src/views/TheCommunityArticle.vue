@@ -5,9 +5,9 @@
         <h1>{{ article.title }}</h1>
         <div id="article-header">
           <div>
-            <img :src="require(`@/assets/profile_img_${article.user.profile_img_id}.jpg`)" 
+            <img v-if="article.profile_path" :src="require(`@/assets/profile_img_${article.profile_path}.jpg`)" 
             class="profile-img" alt="profile_img">
-            {{ article.user.username }}
+            {{ article.username }}
           </div>
           <div>
             <p>작성  |  {{ article.created_at | convertFormat }}</p>
@@ -31,13 +31,13 @@
 
       <div id="article-comments-box">
         <div id="article-comment-title">댓글</div>
-        <ul id="article-comments" v-if="comments">
+        <ul id="article-comments" v-if="comments==[]">
           <li class="article-comment" v-for="(comment, index) in comments" :key="index">
             <div>
-              <img :src="require(`@/assets/profile_img_${comment.user.profile_img_id}.jpg`)" 
+              <img :src="require(`@/assets/profile_img_${comment.profile_path}.jpg`)" 
             class="profile-img comment-profile-img" alt="profile_img">
             </div>
-            <div class="comment-username">{{ comment.user.username }}</div>
+            <div class="comment-username">{{ comment.username }}</div>
             <div class="comment-content">{{ comment.content }}</div>
             <div class="comment-created-at">{{ comment.created_at | convertFormat }}</div>
           </li>
@@ -45,10 +45,11 @@
         <div v-else>
           첫 댓글을 작성해보세요!
         </div>
+        <br>
       </div>
 
       <div id="comment-input-box">
-        <textarea id="comment-input" placeholder="댓글을 입력해주세요..."
+        <textarea id="comment-input" placeholder="댓글을 입력해주세요 :)"
         :commentInput="commentInput" @input="onCommentInput"
         ></textarea>
         <button id="comment-button" @click="createComment" class="btn btn-primary">작성</button>
@@ -59,6 +60,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
     name: 'CommunityArticle',
     data: function () {
@@ -93,7 +96,10 @@ export default {
           // axios
           console.log('좋아요 취소')
           this.isLikeUser = false
-          this.likeUsersCount--
+          if (this.likeUsersCount > 0) {
+            this.likeUsersCount--
+          }
+          
 
         } else {
           // 좋아요 누르기
@@ -106,59 +112,33 @@ export default {
     },
     created: function () {
       const article_id = this.$route.params.article_id
-      console.log(article_id)
+      // console.log(article_id)
       // axios
-
-      const temp_article_result = {
-        "id": 1,
-        "title": "Alone any financial understand social analysis language.",
-        "movie_title": "크루엘라",
-        "content": "History thing grow public pick point mouth. Half share manage trouble after fear nature.\nCollege important avoid surface senior. Create health poor safe magazine that.",
-        "created_at": "1993-10-20T20:18:19Z",
-        "updated_at": "2008-12-19T14:30:03Z",
-        "user": {
-            user_id: 1,
-            username: 'une9',
-            profile_img_id: 1,
-          },
-      }
-
-      this.article = temp_article_result
-
-      const temp_comments_result = [
-        {
-          "user": {
-            user_id: 1,
-            username: 'une9',
-            profile_img_id: 1,
-          },
-          "content": "ㅋㅋㅋㅋ",
-          "created_at": "1993-10-20T20:18:19Z",
-          "updated_at": "2008-12-19T14:30:03Z",
-        },
-        {
-          "user": {
-            user_id: 3,
-            username: 'happy',
-            profile_img_id: 2,
-          },
-          "content": "글 잘 보고 갑니다",
-          "created_at": "1993-10-20T20:18:19Z",
-          "updated_at": "2008-12-19T14:30:03Z",
-        },
-      ]
-
-      this.comments = temp_comments_result
-
-      // 좋아요 기능
-      const temp_like_result = {
-        isLikeUser: true,
-        likeUsersCount: 1,
-      }
-
-      this.isLikeUser = temp_like_result.isLikeUser
-      this.likeUsersCount = temp_like_result.likeUsersCount
+      axios({
+        method: 'get',
+        url: `http://127.0.0.1:8000/community/${article_id}`
+      })
+        .then(res => {
+          // console.log(res)
+          this.article = res.data
+          this.likeUsersCount = res.data.like_article_users | length
+        })
+        .catch(err => {
+          console.log(err)
+        })
       
+      // 댓글
+      axios({
+        method: 'get',
+        url: `http://127.0.0.1:8000/community/${article_id}/comment/`
+      })
+        .then(res => {
+          // console.log(res)
+          this.comments = res.data
+        })
+        .catch(err => {
+          console.log(err)
+        })      
     },
     filters: {
       convertFormat: function (string) {

@@ -6,32 +6,48 @@
     </div>
     <div id="login-form">
       <div>
-        <label for="id">아이디:</label>
-        <input type="text" id="id" v-model="credentials.id">
+        <label for="username">아이디:</label>
+        <input type="text" id="username" v-model="credentials.username">
       </div>
       <div>
         <label for="id">비밀번호:</label>
-        <input type="password" id="password" v-model="credentials.password">
+        <input type="password" id="password" v-model="credentials.password"
+          @keypress.enter="login(credentials)">
       </div>
-      <button @click="login">로그인</button>
+      <button @click="login(credentials)">로그인</button>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
     name: 'Login',
     data: function () {
         return {
           credentials: {
-            id: '',
+            username: '',
             password: '',
+            // nickname: '',
+            // passwordConfirmation: this.credentials.password,
           }
         }
     },
     methods: {
       login: function () {
-        
+        // axios 요청 보내기
+        axios.post(`http://127.0.0.1:8000/accounts/api-token-auth/`, this.credentials)
+          .then((res) => {
+            //console.log(res)
+            // 토큰을 로컬 저장소에 저장하기
+            localStorage.setItem('jwt', res.data.token)
+            this.$emit('login') // App.vue에 로그인됐음을 알림
+            this.$router.push({ name: 'Home' })
+          })
+          .catch(err => {
+            console.log(err)
+          })
       }
     },
 }

@@ -5,6 +5,7 @@ from django.shortcuts import get_list_or_404, get_object_or_404
 from community.serializers import ArticleListSerializer, ArticleSerializer, CommentSerializer
 from .models import Article, Comment
 
+
 # 게시글 전체 조회, 게시글 작성
 @api_view(['GET', 'POST'])
 def article_list(request):
@@ -20,6 +21,7 @@ def article_list(request):
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
 # 게시글 detail           
 @api_view(['GET', 'DELETE', 'PUT'])
 def article_detail(request, article_pk):
@@ -30,7 +32,6 @@ def article_detail(request, article_pk):
     if not request.user.article_set.filter(pk=article_pk).exists():
         return Response({'error': '권한이 없습니다.'})
 
-    
     if request.method == 'DELETE':
         article.delete()
         data = {
@@ -48,7 +49,7 @@ def article_detail(request, article_pk):
 # 게시글 좋아요
 @api_view(['POST'])
 def article_like(request, article_pk):
-    article = get_object_or_404(Article, pk=article_pk)
+    article = Article.objects.get(pk=article_pk)
     if article.like_article_users.filter(pk=request.user.pk).exists():
         article.like_article_users.remove(request.user)
         liked = False
@@ -66,9 +67,10 @@ def article_like(request, article_pk):
 @api_view(['GET'])
 def comment_list(request, article_pk):
     if request.method == 'GET':
-        comments = get_list_or_404(Comment, article=article_pk)
+        comments = Comment.objects.filter(article=article_pk)
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
+
 
 # 댓글 조회, 수정, 삭제    
 @api_view(['GET', 'PUT', 'DELETE'])

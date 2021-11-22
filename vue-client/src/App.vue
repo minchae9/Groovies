@@ -6,26 +6,62 @@
         <router-link :to="{ name: 'Search' }">영화 검색</router-link> |
         <router-link :to="{ name: 'Community' }">커뮤니티</router-link>
       </div>
-      <div>
+      <div v-if="!login">
         <router-link :to="{ name: 'Signup' }">회원가입</router-link> |
         <router-link :to="{ name: 'Login' }">로그인</router-link>
       </div>
+      <div v-if="login">
+        <router-link to="#" @click.native="logout">로그아웃</router-link>
+        <router-link :to="{ name: 'UserProfile' }">마이페이지</router-link> <!--params 넣기 -->
+      </div>
     </div>
-    <router-view id="content" />
+    <router-view id="content" @login="login=true"/>
     <div id="footer"></div>
   </div>
 </template>
 
 <script>
-  export default {
-    watch: {
-          $route (to, from){
-              if (!(to.name ==='Search' && from.name === 'Home')) {
-                this.$store.dispatch('resetSearchKeyword')
-              }
-          }
+// import axios from 'axios'
+
+export default {
+  name: 'App',
+  data: function () {
+    return {
+      login: false,
+    }
+  },
+  methods: {
+    logout: function () {
+      localStorage.removeItem('jwt')
+      this.$router.push({ name: 'Login' })
+      this.login=false
+    },
+  },
+  created: function () {
+    const token = localStorage.getItem('jwt')
+    // 토큰이 있다면 this.login을 true로 변경
+    if (token) {
+      this.login = true
+    }
+  },
+  watch: {
+    $route (to, from){
+      if (!(to.name ==='Search' && from.name === 'Home')) {
+        this.$store.dispatch('resetSearchKeyword')
       }
-  }
+    }
+  },
+  // computed: {
+  //   user_id: function () {
+  //     if (login) {
+  //       axios({
+  //         method: 'get',
+  //         url: 'http://127.0.0.1:8000/accounts/profile'
+  //       })
+  //     }
+  //   }
+  // }
+}
 </script>
 
 
@@ -49,6 +85,23 @@
      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
      font-weight: normal;
      font-style: normal;
+}
+
+.btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
+    background-color: rgb(112,34,171) !important;
+    border-color: rgb(112,34,171) !important;
+}
+
+.btn-check:focus + .btn, .btn:focus {
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgb(112,34,171, 0.5) !important;
+}
+
+.btn-check:focus + .btn-primary, .btn-primary:focus {
+  color: #fff;
+  background-color: rgb(112,34,171) !important;
+  border-color: rgb(112,34,171) !important;
+  box-shadow: 0 0 0 0.25rem rgb(112,34,171, 0.5) !important;
 }
 
 .logo {

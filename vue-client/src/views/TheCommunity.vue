@@ -6,16 +6,17 @@
         @click="moveToArticle(articleListItem.id)">
         {{ articleList ? articleListItem.title : null }}</span>
         <span class="article-list-item-user" 
-        @click="moveToUserProfile(articleListItem.user.user_id)">
-          {{ articleList ? articleListItem.user.username : null }}</span>
+          @click="moveToUserProfile(articleListItem.user.user_id)">
+          {{ articleList ? articleListItem.username : null }}
+        </span>
         <span>{{ articleList ? articleListItem.created_at : null }}</span>
       </li>
       <!-- list -->
     </ul>
     <div v-else>
       <h2>첫 게시글을 남겨주세요.</h2>
-      <button>작성</button>
     </div>
+    <button @click="createArticle">작성</button>
   </div>
 </template>
 
@@ -26,7 +27,7 @@ export default {
     name: 'Community',
     data: function () {
       return {
-        articleList: null,
+        articleList: [],
       }
     },
     methods: {
@@ -36,21 +37,28 @@ export default {
       moveToUserProfile: function (user_id) {
         this.$router.push({ name: 'UserProfile', params: { user_id: user_id }})
       },
+      createArticle: function () {
+        this.$router.push({ name: 'CommunityArticleCreate' })
+      }
     },
     created: function () {
       //axios
+      // 게시글 목록
       axios({
         method: 'get',
         url: 'http://127.0.0.1:8000/community/'
       })
         .then (res => {
-          this.articleList = res.data         
+          this.articleList = res.data
+          // console.log(res.data)      
         })
         .catch (err => {
           console.log(err.response)
         })
-    }
-}
+    },
+
+  }
+
 </script>
 
 <style>

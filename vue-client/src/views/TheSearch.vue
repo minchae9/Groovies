@@ -1,8 +1,11 @@
 <template>
   <div id="search">
       <search-bar></search-bar>
-      <movie-list v-if="searchKeyword" :movieItems="movieItems"></movie-list>
+      <h1 v-if="searchKeyword">검색 결과</h1>
+      <br>
+      <movie-list v-if="(searchKeyword, movieItems)" :movieItems="movieItems"></movie-list>
       <div v-if="!searchKeyword">관심 있는 키워드 혹은 영화 제목을 검색해보세요!</div>
+      <div v-if="!movieItems">조회된 결과가 없습니다. 새로운 검색어를 입력해주세요.</div>
   </div>
 </template>
 

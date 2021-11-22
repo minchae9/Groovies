@@ -26,10 +26,6 @@ export default {
 </script>
 
 <style>
-    .movieListWrapper {
-        
-    }
-
     .movieList {
         padding: 0;
         max-width: 1200px;

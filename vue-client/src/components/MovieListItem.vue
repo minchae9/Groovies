@@ -9,7 +9,6 @@ export default {
     name: 'MovieItem',
     data: function () {
         return {
-
         }
     },
     props: {
@@ -22,9 +21,10 @@ export default {
     },
     computed: {
       poster_path: function () {
-        return `https://image.tmdb.org/t/p/original/${this.movieItem.poster_path}`
+        return (this.movieItem && this.movieItem.poster_path) ? `https://image.tmdb.org/t/p/original/${this.movieItem.poster_path}` : ''
       }
     },
+
 }
 </script>
 

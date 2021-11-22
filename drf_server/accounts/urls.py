@@ -13,4 +13,5 @@ urlpatterns = [
     path('mycomments/', views.my_comments, name='my_comments'),   # 작성한 한줄 댓글 목록 반환
     path('myarticles/', views.my_articles, name='my_articles'),     # 작성한 게시글 목록 반환
     path('api-token-auth/', obtain_jwt_token),
+    path('profile/<int:profile_pk>/', views.profile, name='profile'),    # 프로필 조회
 ]

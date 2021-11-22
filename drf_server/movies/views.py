@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view
 from django.shortcuts import get_list_or_404, get_object_or_404
 from movies.serializers import MovieListSerializer, MovieSerializer, CommentSerializer, RatingSerializer, ActorSerializer, DirectorSerializer, SimilarSerializer
 from .models import Comment, Rating, Movie, Similar, Cart
+import random
 
 
 # 전체 댓글      
@@ -136,9 +137,11 @@ def recommendation(request):
             result = result | similar_movies   
     else:
         result = Movie.objects.all()
-    serializer = MovieSerializer(result, many=True)
-    return Response(serializer.data)
-    # return Response({'message': '추천을 받으려면 영화에 평점을 더 남겨주세요.'})
+    random_picked = random.sample(list(result), 15)
+    carousel_picked = random.sample(list(result), 5)
+    serializer1 = MovieListSerializer(random_picked, many=True)
+    serializer2 = MovieSerializer(carousel_picked, many=True)
+    return Response({"recommendations": serializer1.data, "carousel_items": serializer2.data})
 
 
 @api_view(['POST'])
