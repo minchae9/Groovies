@@ -4,7 +4,7 @@
       <div>
         <router-link :to="{ name: 'Home' }"><img src="@/assets/logo.png" alt="logo" class="mainlogo"></router-link> |
         <router-link :to="{ name: 'Search' }">영화 검색</router-link> |
-        <router-link :to="{ name: 'Community' }">커뮤니티</router-link>
+        <router-link :to="{ name: 'Community' }" :login="login">커뮤니티</router-link>
       </div>
       <div v-if="!login">
         <router-link :to="{ name: 'Signup' }">회원가입</router-link> |

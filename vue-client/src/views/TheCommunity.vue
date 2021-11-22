@@ -38,7 +38,7 @@ export default {
         this.$router.push({ name: 'UserProfile', params: { user_id: user_id }})
       },
       createArticle: function () {
-        this.$router.push({ name: 'CommunityArticleCreate' })
+        this.$router.push({ name: 'CommunityArticleCreate' }, this.login)
       }
     },
     created: function () {

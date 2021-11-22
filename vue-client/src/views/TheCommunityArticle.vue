@@ -64,6 +64,9 @@ import axios from 'axios'
 
 export default {
     name: 'CommunityArticle',
+    props: {
+      login: Boolean,
+    },
     data: function () {
       return {
         article: {},
@@ -107,23 +110,24 @@ export default {
         }
       },
       toggleLike: function () {
-        if (this.isLikeUser) {
+        if (this.login) {
+          if (this.isLikeUser) {
           // 좋아요 취소
           // axios
           console.log('좋아요 취소')
           this.isLikeUser = false
           if (this.likeUsersCount > 0) {
             this.likeUsersCount--
+            }
+          } else {
+            // 좋아요 누르기
+            // axios
+            console.log('좋아요 누르기')
+            this.isLikeUser = true
+            this.likeUsersCount++
           }
-          
-
-        } else {
-          // 좋아요 누르기
-          // axios
-          console.log('좋아요 누르기')
-          this.isLikeUser = true
-          this.likeUsersCount++
         }
+        
       }
     },
     created: function () {
