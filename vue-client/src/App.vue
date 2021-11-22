@@ -45,9 +45,14 @@ export default {
       this.$router.push({ name: 'Home' })
     },
     // 현재 로그인한 유저 정보 받기
-    getUserInfo: function (userInfo) {
-      this.userInfo.user_id = userInfo.user_id
-      this.userInfo.username = userInfo.username
+    getUserInfo: function () {
+      // 유저 정보 추출
+      const JWTtoken = localStorage.getItem('jwt')
+      var base64Payload = JWTtoken.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE 
+      var payload = Buffer.from(base64Payload, 'base64'); 
+      var result = JSON.parse(payload.toString()) 
+      this.userInfo.user_id = result.user_id
+      this.userInfo.username = result.username
       // console.log(this.userInfo)
       this.$store.dispatch('storeLoginUser', this.userInfo)    
     },
@@ -58,11 +63,14 @@ export default {
     if (token) {
       this.login = true
     }
+    this.getUserInfo()
   },
   watch: {
     $route (to, from){
-      if (!(to.name ==='Search' && from.name === 'Home')) {
-        this.$store.dispatch('resetSearchKeyword')
+      if (to.name ==='Search' && from.name === 'Home') {
+        // this.$store.dispatch('resetSearchKeyword')
+        console.log('route change', this.$route.params.keyword)
+        this.$store.dispatch('onSearch', this.$route.params.keyword) 
       }
     }
   },
@@ -70,6 +78,7 @@ export default {
     loginUserInfo: function () {
       return this.$store.state.loginUser
     }
+    
   }
 }
 </script>

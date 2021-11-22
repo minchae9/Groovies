@@ -2,10 +2,10 @@
   <div id="searchBar">
       <input type="text" id="SearchInput" 
         class="search-bar"
-        placeholder="검색어를 입력하십시오" 
+        placeholder="검색어를 입력하세요" 
         :value="searchKeyword" @input="updateInput" 
-        @keypress.enter="onSearch(searchKeyword)">
-      <button @click="onSearch(searchKeyword)" class="search-button">
+        @keypress.enter="onSearch">
+      <button @click="onSearch" class="search-button">
           <img src="@/assets/search.png" class="search-icon">
       </button>
   </div>
@@ -21,24 +21,30 @@ export default {
         }
     },
     methods: {
-        onSearch: function (searchKeyword) {
-            // console.log('onSearch!')
-            if (searchKeyword) {
-                this.$store.dispatch('onSearch', searchKeyword)
-                if (this.$route.path !== '/search') {
-                    this.$router.push({ name: 'Search' })
-                }
+        onSearch: function () {
+            // console.log('onSearch! method', this.searchKeyword)
+
+            if (this.searchKeyword) {
+                this.$router.push({ name: 'Search', params: { keyword : this.searchKeyword }})
+                .then(() => {
+                    const searchInput = document.querySelector('#SearchInput')
+                    searchInput.blur()
+                })
+                .catch(()=>{})
             }
         },
         updateInput: function(event) {
             this.searchKeyword = event.target.value
-        },
+        }
     },
     created: function () {
-        if (this.$route.path === '/search') {
+        console.log('created searchbar')
+        if (/^\/search\//.test(this.$route.path)) {
+            // console.log('if created')
             this.searchKeyword = this.$store.state.searchKeyword
         }
     },
+    
 }
 </script>
 

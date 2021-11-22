@@ -3,13 +3,11 @@ import VueRouter from 'vue-router'
 import Home from '@/views/Home.vue'
 import Community from '@/views/TheCommunity.vue'
 import CommunityArticle from '@/views/TheCommunityArticle.vue'
-import CommunityArticleCreate from '@/views/TheCommunityArticleCreate.vue'
 import Search from '@/views/TheSearch.vue'
 import Signup from '@/views/TheSignup.vue'
 import Login from '@/views/TheLogin.vue'
 import MovieDetail from '@/views/TheMovieDetail.vue'
 import UserProfile from '@/views/TheUserProfile.vue'
-
 
 Vue.use(VueRouter)
 
@@ -30,15 +28,10 @@ const routes = [
     component: CommunityArticle
   },
   {
-    path: '/community/create',
-    name: 'CommunityArticleCreate',
-    component: CommunityArticleCreate
-  },
-  {
-    // path: '/search/:searchKeyword',
-    path: '/movies/search',
+    path: '/search/:keyword?',
     name: 'Search',
-    component: Search
+    component: Search,
+    props: true
   },
   {
     path: '/accounts/signup',
@@ -67,13 +60,6 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes,
 })
-
-const originalPush = VueRouter.prototype.push;
-VueRouter.prototype.push = function push(location) {
-	return originalPush.call(this, location).catch(err => {
-		if (err.name !== 'NavigationDuplicated') throw err;
-	});
-};
 
 
 export default router

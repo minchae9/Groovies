@@ -12,6 +12,7 @@ export default new Vuex.Store({
   },
   mutations: {
     ON_SEARCH: function (state, searchKeyword) {
+      // console.log('mutations:onSearch', searchKeyword)
       state.searchKeyword = searchKeyword
     },
     RESET_SEARCH_KEYWORD: function (state) {
@@ -22,11 +23,11 @@ export default new Vuex.Store({
     },
     STORE_LOGIN_USER: function (state, userInfo) {
       state.loginUser = userInfo
-    }
-
+    },
   },
   actions: {
     onSearch: function ({ commit }, searchKeyword) {
+      // console.log('actions:onSearch', searchKeyword)
       commit('ON_SEARCH', searchKeyword)
     },
     resetSearchKeyword: function ({ commit }) {

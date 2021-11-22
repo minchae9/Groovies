@@ -84,12 +84,12 @@
 
 
 <script>
-import _ from 'lodash'
+// import _ from 'lodash'
 
 export default {
     name: 'Carousel',
     props: {
-      movieItems: Array,
+      carouselItems: Array,
     },
     data: function () {
         return {
@@ -106,11 +106,11 @@ export default {
       }         
     },
     computed: {
-        carouselItems: function () {
-            const picks = _.sampleSize(this.movieItems, 5)
-            // console.log(picks)
-            return picks
-        },
+        // carouselItems: function () {
+        //     const picks = _.sampleSize(this.movieItems, 5)
+        //     // console.log(picks)
+        //     return picks
+        // },
     },
     filters: {
       getYear: function (string) {

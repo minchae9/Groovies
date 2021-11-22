@@ -1,6 +1,6 @@
 <template>
   <div>
-    <carousel id="carousel" :movieItems="carousel_items"></carousel>
+    <carousel id="carousel" :carouselItems="carousel_items"></carousel>
     <search-bar id="home-search-bar"></search-bar>
     <movie-list :movieItems="recommendations"></movie-list>
   </div>
@@ -23,7 +23,43 @@ export default {
     data: function () {
         return {
             recommendations: [],
-            carousel_items: [],
+            carousel_items: [
+                {
+                    id: 0,
+                    title: '',
+                    tagline: '',
+                    release_date: '',
+                    poster_path: '',
+                },
+                {
+                    id: 1,
+                    title: '',
+                    tagline: '',
+                    release_date: '',
+                    poster_path: '',
+                },
+                {
+                    id: 2,
+                    title: '',
+                    tagline: '',
+                    release_date: '',
+                    poster_path: '',
+                },
+                {
+                    id: 3,
+                    title: '',
+                    tagline: '',
+                    release_date: '',
+                    poster_path: '',
+                },
+                {
+                    id: 4,
+                    title: '',
+                    tagline: '',
+                    release_date: '',
+                    poster_path: '',
+                },
+            ],
         }
     },
     methods: {

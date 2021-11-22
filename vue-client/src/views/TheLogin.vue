@@ -46,14 +46,8 @@ export default {
             // 토큰을 로컬 저장소에 저장하기
             localStorage.setItem('jwt', res.data.token)
             this.token = res.data.token
-            
-            // 유저 정보 추출
-            const JWTtoken = this.token
-            var base64Payload = JWTtoken.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE 
-            var payload = Buffer.from(base64Payload, 'base64'); 
-            var result = JSON.parse(payload.toString()) 
-            // console.log(result);
-            this.$emit('getUserInfo', result)
+            // 로그인
+            this.$emit('getUserInfo')
 
             // App.vue에 로그인됐음을 알림
             this.$emit('login')
