@@ -62,6 +62,7 @@ export default {
           .catch(() => {
             // console.log(err)
             this.error_message = "로그인 정보가 틀렸습니다."
+            this.credentials.password = ''
           })
         // 유저 정보(아이디 정보)
         

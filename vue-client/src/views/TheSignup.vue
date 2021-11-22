@@ -7,15 +7,16 @@
     </div>
     <div id="signup-form">
       <div>
-        <label for="username">이름:</label>
-        <input type="text" id="username" @input="[checkValidUsername(), onInputUsername()]"
-        :value="credentials.username"
-        :class="{ red: isInvalidUsername }">
+        <label for="username">닉네임:</label>
+        <input type="text" id="username" v-model="credentials.username" :class="{ red: checkValidUsername }">
+        <p class="tag" v-if="credentials.username" v-show="!checkValidUsername">사용 가능한 닉네임입니다.</p>
+        <p class="tag invalid" v-if="credentials.username" v-show="checkValidUsername">이미 사용중인 닉네임입니다.</p>
       </div>
       <div>
         <label for="id">아이디:</label>
-        <input type="text" id="id" v-model="credentials.id">
-        <p class="tag">사용 가능한 아이디입니다.</p>
+        <input type="text" id="id" v-model="credentials.id" :class="{ red: checkValidId }">
+        <p class="tag" v-if="credentials.id" v-show="!checkValidId">사용 가능한 아이디입니다.</p>
+        <p class="tag invalid" v-if="credentials.id" v-show="checkValidId">이미 사용중인 아이디입니다.</p>
       </div>
       <div>
         <label for="id">비밀번호:</label>
@@ -39,6 +40,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
     name: 'Signup',
     data: function () {
@@ -49,37 +52,42 @@ export default {
             password: '',
             passwordConfirmation: '',
           },
-          isInvalidUsername: false,
-          isInvalidId: false,
           isInvalidPW: false,
           isNotSamePW: false,
+          existingId: [],
+          existingUsername: [],
         }
     },
     methods: {
       signup: function () {
         const agreed = document.querySelector('#agree').checked
-        if (!this.isInvalidUsername && !this.isInvalidId && !this.isInvalidPW && !this.isNotSamePW && agreed) {
+        if (!this.checkValidUsername && !this.checkValidId && !this.isInvalidPW && !this.isNotSamePW && agreed) {
           // 회원가입 가능
-          console.log(this.credentials)
-          console.log('회원가입!')
+          // console.log(this.credentials)
+          // console.log('회원가입!')
+          axios({
+            method: 'post',
+            url: 'http://127.0.0.1:8000/accounts/signup/',
+            data: {
+              nickname: this.credentials.username,
+              username: this.credentials.id,
+              password: this.credentials.password,
+              passwordConfirmation: this.credentials.passwordConfirmation
+            }
+          })
+            .then(() => {
+              // console.log(res)
+            })
+            .catch(err => {
+              console.log(err)
+            })
 
         } else {
           // 회원가입 불가능
           console.log('회원가입 불가! 정보 입력을 모두 완료해주세요.')
         }
       },
-      onInputUsername: function () {
-        const usernameInput = document.querySelector('#username')
-        this.credentials.username = usernameInput.value
-        console.log(this.credentials.username)
-      },
-      checkValidUsername: function () {
-        if (this.credentials.username.length) {
-          this.isInvalidUsername = false
-        } else {
-          this.isInvalidUsername = true
-        }
-      },
+      // 비밀번호
       checkValidPW: function () {
         if (this.credentials.password.length) {
           if (/^(?=.*[a-zA-Z])(?=.*[0-9]).{8,}$/.test(this.credentials.password)) {
@@ -102,12 +110,71 @@ export default {
           this.isNotSamePW = false
         }
       },
-
+      getAllIDs: function () {
+        //axios
+        axios({
+          method: 'get',
+          url: 'http://127.0.0.1:8000/accounts/profile/'
+        })
+          .then(res => {
+            // console.log(res)
+            const userList = []
+            for (let i=0; i < res.data.length ; i++) {
+              userList.push(res.data[i].username)
+            }
+            this.existingId = userList
+            // console.log(this.existingUsername)
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      },
+      getAllUsernames: function () {
+        //axios
+        axios({
+          method: 'get',
+          url: 'http://127.0.0.1:8000/accounts/profile/'
+        })
+          .then(res => {
+            // console.log(res)
+            const userList = []
+            for (let i=0; i < res.data.length ; i++) {
+              userList.push(res.data[i].nickname)
+            }
+            this.existingUsername = userList
+            // console.log(this.existingUsername)
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      },
+    },
+    created: function () {
+      this.getAllIDs()
+      this.getAllUsernames()
+    },
+    computed:{
+      checkValidId(){
+        let usedId = this.existingId.includes(this.credentials.id)
+        // let apples = this.selectedProducts.includes("Apples")
+        if (this.existingId.length > 0 && usedId) return true
+        // if (this.selectedProducts.length === 1 && (apples || pears)) return true
+        return false
+      },
+      checkValidUsername(){
+        let usedUsername = this.existingUsername.includes(this.credentials.username)
+        if (this.existingUsername.length > 0 && usedUsername) return true
+        return false
+      },
     },
 }
 </script>
 
 <style>
+  .invalid {
+    color: red;
+  }
+
   .page-title {
     font-family: scd6;
     font-size: 1.75rem;

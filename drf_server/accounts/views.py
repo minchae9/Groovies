@@ -131,9 +131,7 @@ def my_articles(request):
 
 
 @api_view(['GET'])
-def profile(request, profile_id):
-    if request.user.is_authenticated:
-        user = get_user_model().objects.filter(username=profile_id)
-        serializer = UserSerializer(user)
-        return Response(serializer.data)
-    return Response({'error': '로그인이 필요한 기능입니다.'})
+def profile(request):
+    users = get_user_model().objects.all()
+    serializer = UserSerializer(users, many=True)
+    return Response(serializer.data)
