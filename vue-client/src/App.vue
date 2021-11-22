@@ -11,11 +11,14 @@
         <router-link :to="{ name: 'Login' }">로그인</router-link>
       </div>
       <div v-if="login">
+        {{ loginUserInfo.username }}님 환영합니다.
+      </div>
+      <div v-if="login">
         <router-link to="#" @click.native="logout">로그아웃</router-link>
-        <router-link :to="{ name: 'UserProfile' }">마이페이지</router-link> <!--params 넣기 -->
+        <router-link v-if="login" :to="{ name: 'UserProfile', params: { user_id: loginUserInfo.user_id }}">마이페이지</router-link>
       </div>
     </div>
-    <router-view id="content" @login="login=true"/>
+    <router-view id="content" @login="login=true" @getUserInfo="getUserInfo"/>
     <div id="footer"></div>
   </div>
 </template>
@@ -28,13 +31,25 @@ export default {
   data: function () {
     return {
       login: false,
+      // 현재 로그인한 유저 정보
+      userInfo: {
+        user_id: '',
+        username: '',
+      }
     }
   },
   methods: {
     logout: function () {
       localStorage.removeItem('jwt')
-      this.$router.push({ name: 'Login' })
       this.login=false
+      this.$router.push({ name: 'Home' })
+    },
+    // 현재 로그인한 유저 정보 받기
+    getUserInfo: function (userInfo) {
+      this.userInfo.user_id = userInfo.user_id
+      this.userInfo.username = userInfo.username
+      // console.log(this.userInfo)
+      this.$store.dispatch('storeLoginUser', this.userInfo)    
     },
   },
   created: function () {
@@ -51,16 +66,11 @@ export default {
       }
     }
   },
-  // computed: {
-  //   user_id: function () {
-  //     if (login) {
-  //       axios({
-  //         method: 'get',
-  //         url: 'http://127.0.0.1:8000/accounts/profile'
-  //       })
-  //     }
-  //   }
-  // }
+  computed: {
+    loginUserInfo: function () {
+      return this.$store.state.loginUser
+    }
+  }
 }
 </script>
 

@@ -10,8 +10,8 @@
         <div class="carousel-item active" v-if="carouselItems">
           <img :src=getPosterPath(carouselItems[0]) class="d-block w-100" alt="poster image">
           <div class="carousel-caption d-none d-md-block">
-            <div class="movieInfo">
-              <h5 v-if="carouselItems[0]">
+            <div class="movieInfo" v-if="carouselItems[0]">
+              <h5>
                 {{ carouselItems[0].title }}
                 <!-- <span class="release-year">({{ carouselItems[0].release_date | getYear }})</span> -->
               </h5>
@@ -24,8 +24,8 @@
         <div class="carousel-item" v-if="carouselItems">
           <img :src=getPosterPath(carouselItems[1]) class="d-block w-100" alt="poster image">
           <div class="carousel-caption d-none d-md-block">
-            <div class="movieInfo">
-              <h5 v-if="carouselItems[1]">
+            <div class="movieInfo" v-if="carouselItems[1]">
+              <h5>
                 {{ carouselItems[1].title }}
                 <!-- <span class="release-year">({{ carouselItems[1].release_date | getYear }})</span> -->
               </h5>
@@ -38,8 +38,8 @@
         <div class="carousel-item" v-if="carouselItems">
           <img :src=getPosterPath(carouselItems[2]) class="d-block w-100" alt="poster image">
           <div class="carousel-caption d-none d-md-block">
-            <div class="movieInfo">
-              <h5 v-if="carouselItems[2]">
+            <div class="movieInfo" v-if="carouselItems[2]">
+              <h5>
                 {{ carouselItems[2].title }}
                 <!-- <span class="release-year">({{ carouselItems[2].release_date | getYear }})</span> -->
               </h5>
@@ -52,8 +52,8 @@
         <div class="carousel-item" v-if="carouselItems">
           <img :src=getPosterPath(carouselItems[3]) class="d-block w-100" alt="poster image">
           <div class="carousel-caption d-none d-md-block">
-            <div class="movieInfo">
-              <h5 v-if="carouselItems[3]">
+            <div class="movieInfo" v-if="carouselItems[3]">
+              <h5>
                 {{ carouselItems[3].title }}
                 <!-- <span class="release-year">({{ carouselItems[3].release_date | getYear }})</span> -->
               </h5>
@@ -66,8 +66,8 @@
         <div class="carousel-item">
           <img :src=getPosterPath(carouselItems[4]) class="d-block w-100" alt="poster image">
           <div class="carousel-caption d-none d-md-block">
-            <div class="movieInfo">
-              <h5 v-if="carouselItems[4]">
+            <div class="movieInfo" v-if="carouselItems[4]">
+              <h5>
                 {{ carouselItems[4].title }}
                 <!-- <span class="release-year">({{ carouselItems[4].release_date | getYear }})</span> -->
               </h5>
@@ -78,6 +78,7 @@
           </div>
         </div>
       </div>
+    </div>
   </div>
 </template>
 
@@ -107,7 +108,7 @@ export default {
     computed: {
         carouselItems: function () {
             const picks = _.sampleSize(this.movieItems, 5)
-            console.log(picks)
+            // console.log(picks)
             return picks
         },
     },

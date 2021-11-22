@@ -80,7 +80,23 @@ export default {
       createComment: function () {
         if (this.commentInput) {
           // axios
-          console.log('댓글 작성!: ', this.commentInput)
+          // console.log('댓글 작성!: ', this.commentInput)
+          // axios({
+          //   method: 'post',
+          //   url: `http://127.0.0.1:8000/${this.article.id}/comment/create/`,
+          //   data: { comment: {
+          //     content : this.commentInput,
+          //     article_id: this.article.id,
+          //     user_id: 
+          //   }}
+          // })
+          //   .then(res => {
+          //     console.log(res)
+          //   })
+          //   .catch(err => {
+          //     console.log(err)
+          //   })
+          
 
           // comments에 작성 댓글 추가
 

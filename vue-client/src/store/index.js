@@ -8,6 +8,7 @@ export default new Vuex.Store({
   state: {
     searchKeyword: '',
     selectedMovie: {},
+    loginUser: {},
   },
   mutations: {
     ON_SEARCH: function (state, searchKeyword) {
@@ -19,6 +20,9 @@ export default new Vuex.Store({
     UPDATE_MOVIE_DETAIL: function (state, movieDetail) {
       state.selectedMovie = movieDetail
     },
+    STORE_LOGIN_USER: function (state, userInfo) {
+      state.loginUser = userInfo
+    }
 
   },
   actions: {
@@ -44,6 +48,9 @@ export default new Vuex.Store({
         .catch(err => {
           console.log(err)
         })
+    },
+    storeLoginUser: function ({ commit }, userInfo) {
+      commit('STORE_LOGIN_USER', userInfo)
     },
   },
   modules: {
