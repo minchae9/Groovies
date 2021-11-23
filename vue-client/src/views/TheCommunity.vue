@@ -11,7 +11,6 @@
         </span>
         <span>{{ articleList ? articleListItem.created_at : null | convertFormat }}</span>
       </li>
-      <!-- list -->
     </ul>
     <div v-else>
       <h2>첫 게시글을 남겨주세요.</h2>
