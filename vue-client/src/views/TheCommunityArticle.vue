@@ -141,9 +141,9 @@ export default {
             console.log(err)
           })
       },
-      // updateArticle: function (article) {
-
-      // },
+      updateArticle: function (article) {
+        this.$router.push({ name: 'CommunityArticleCreate', query: {article: article.id}})
+      },
       deleteArticle: function (article) {
         axios({
           method: 'delete',

@@ -7,19 +7,21 @@ from .models import Article, Comment
 
 
 # 게시글 전체 조회, 게시글 작성
-@api_view(['GET', 'POST'])
+@api_view(['GET'])
 def article_list(request):
-    if request.method == 'GET':
-        articles = Article.objects.all()
-        if articles:
-            serializers = ArticleListSerializer(articles, many=True)
-            return Response(serializers.data)
-        return Response(None)
-    elif request.method == 'POST':
-        serializer = ArticleSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+    articles = Article.objects.all()
+    if articles:
+        serializers = ArticleListSerializer(articles, many=True)
+        return Response(serializers.data)
+    return Response(None)
+
+
+@api_view(['POST'])
+def article_create(request):
+    serializer = ArticleSerializer(data=request.data)
+    if serializer.is_valid(raise_exception=True):
+        serializer.save(user=request.user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 # 게시글 detail           

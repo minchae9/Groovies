@@ -79,7 +79,7 @@ export default new Vuex.Store({
     },
     getUserOthers: function ({ commit }, nickname, profile_path) {
       commit('GET_USER_OTHERS', nickname, profile_path)
-    }
+    },
   },
   modules: {
   }

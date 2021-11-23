@@ -73,6 +73,7 @@ export default {
           console.log(err)
         })
     },
+    
   },
   created: function () {
     const token = localStorage.getItem('jwt')

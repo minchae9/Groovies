@@ -3,6 +3,7 @@ import VueRouter from 'vue-router'
 import Home from '@/views/Home.vue'
 import Community from '@/views/TheCommunity.vue'
 import CommunityArticle from '@/views/TheCommunityArticle.vue'
+import CommunityArticleCreate from '@/views/TheCommunityArticleCreate.vue'
 import Search from '@/views/TheSearch.vue'
 import Signup from '@/views/TheSignup.vue'
 import Login from '@/views/TheLogin.vue'
@@ -26,6 +27,11 @@ const routes = [
     path: '/community/:article_id',
     name: 'CommunityArticle',
     component: CommunityArticle
+  },
+  {
+    path: '/community/create',
+    name: 'CommunityArticleCreate',
+    component: CommunityArticleCreate
   },
   {
     path: '/search/:keyword?',

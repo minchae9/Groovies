@@ -16,7 +16,7 @@
     <div v-else>
       <h2>첫 게시글을 남겨주세요.</h2>
     </div>
-    <button @click="createArticle">작성</button>  <!--게시글 작성 뷰로 연결되도록-->
+    <button v-if="this.$store.state.loginUser" @click="createArticle">작성</button>
   </div>
 </template>
 
@@ -38,7 +38,7 @@ export default {
         this.$router.push({ name: 'UserProfile', params: { user_id: user_id }})
       },
       createArticle: function () {
-        // this.$router.push({ name: 'CommunityArticleCreate' }, this.login)
+        this.$router.push({ name: 'CommunityArticleCreate' })
       }
     },
     created: function () {
