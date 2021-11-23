@@ -61,5 +61,11 @@ const router = new VueRouter({
   routes,
 })
 
+// 같은 페이지에서 parameter만 변경할 때 NavigationDuplicated 에러 발생 방지
+const originalPush = VueRouter.prototype.push;
+VueRouter.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(() => {
+  });
+};
 
 export default router

@@ -81,8 +81,6 @@ export default {
   watch: {
     $route (to, from){
       if (to.name ==='Search' && from.name === 'Home') {
-        // this.$store.dispatch('resetSearchKeyword')
-        console.log('route change', this.$route.params.keyword)
         this.$store.dispatch('onSearch', this.$route.params.keyword) 
       }
     }
@@ -91,8 +89,7 @@ export default {
     loginUserInfo: function () {
       return this.$store.state.loginUser
     }
-    
-  }
+  },
 }
 </script>
 
@@ -119,21 +116,42 @@ export default {
      font-style: normal;
 }
 
+/* override bootstrap */
 .btn-primary, .btn-primary:hover, .btn-primary:active, .btn-primary:visited {
     background-color: rgb(112,34,171) !important;
     border-color: rgb(112,34,171) !important;
 }
 
+/* override bootstrap */
 .btn-check:focus + .btn, .btn:focus {
   outline: 0;
   box-shadow: 0 0 0 0.25rem rgb(112,34,171, 0.5) !important;
 }
 
+/* override bootstrap */
 .btn-check:focus + .btn-primary, .btn-primary:focus {
   color: #fff;
   background-color: rgb(112,34,171) !important;
-  border-color: rgb(112,34,171) !important;
   box-shadow: 0 0 0 0.25rem rgb(112,34,171, 0.5) !important;
+}
+
+/* override bootstrap */
+textarea:hover, 
+input:hover, 
+textarea:active, 
+input:active, 
+textarea:focus, 
+input:focus,
+button:focus,
+button:active,
+button:hover,
+label:focus,
+.btn:active,
+.btn.active
+{
+  outline: none !important;
+  -webkit-appearance:none;
+  box-shadow: none !important;
 }
 
 .logo {

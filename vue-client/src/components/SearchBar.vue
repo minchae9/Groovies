@@ -12,6 +12,7 @@
 </template>
 
 <script>
+// import { mapState } from 'vuex'
 
 export default {
     name: 'SearchBar',
@@ -23,14 +24,17 @@ export default {
     methods: {
         onSearch: function () {
             // console.log('onSearch! method', this.searchKeyword)
-
-            if (this.searchKeyword) {
+            // console.log('route', this.$route)
+            if (this.searchKeyword && this.searchKeyword !== this.$route.params.keyword) {
                 this.$router.push({ name: 'Search', params: { keyword : this.searchKeyword }})
                 .then(() => {
                     const searchInput = document.querySelector('#SearchInput')
                     searchInput.blur()
                 })
-                .catch(()=>{})
+                .catch((err)=>{
+                    console.log(err)
+                })
+
             }
         },
         updateInput: function(event) {
@@ -44,7 +48,21 @@ export default {
             this.searchKeyword = this.$store.state.searchKeyword
         }
     },
-    
+    watch: {
+        // searchKeyword: function () {
+        //     const searchInput = document.querySelector('#SearchInput')
+        //     searchInput.target.value = this.searchKeyword
+        // },
+        '$route.params.keyword': {
+            handler(value) {
+                const searchInput = document.querySelector('#SearchInput')
+                searchInput.value = value
+            },
+            deep: true,
+            immediate: true
+        }
+
+    },    
 }
 </script>
 
@@ -54,6 +72,7 @@ export default {
         height: 3rem;
         padding: 16px;
         border-radius: 1.5rem 1rem 1rem 1.5rem;
+        border: 0;
         margin-bottom: 48px;
     }
 

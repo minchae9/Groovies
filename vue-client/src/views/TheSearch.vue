@@ -33,7 +33,7 @@ export default {
                 url: `http://127.0.0.1:8000/movies/search/${this.keyword}`
             })
             .then(res => {
-                console.log('search result: ', res)
+                // console.log('search result: ', res)
                 this.movieItems = res.data
             })
             .catch(err => {

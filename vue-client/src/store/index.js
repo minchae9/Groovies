@@ -41,18 +41,36 @@ export default new Vuex.Store({
       this.getMovieDetail(selectedMovieId)
     },
     getMovieDetail: function({ commit }, movieId) {
-      // axios
-      axios({
-        method: 'get',
-        url: `http://127.0.0.1:8000/movies/${movieId}/`,
-      })
-        .then(res => {
-          // console.log(res)
-          commit('UPDATE_MOVIE_DETAIL', res.data)
-        })
+      // 영화 정보
+      let details = `http://127.0.0.1:8000/movies/${movieId}/`
+      let actor = `http://127.0.0.1:8000/movies/${movieId}/actor/`
+      let director = `http://127.0.0.1:8000/movies/${movieId}/director/`
+      let similar = `http://127.0.0.1:8000/movies/${movieId}/similar/`
+      
+      const requestDetails = axios.get(details)
+      const requestActor = axios.get(actor)
+      const requestDirector = axios.get(director)
+      const requestSimilar = axios.get(similar)
+
+      axios.all([requestDetails, requestActor, requestDirector, requestSimilar])
+        .then(axios.spread((...responses) => {
+          const requestDetails = responses[0].data
+          const requestActor = responses[1].data
+          const requestDirector = responses[2].data
+          const requestSimilar = responses[3].data
+          const allDetails = {
+            MovieDetails: requestDetails,
+            Actor: requestActor,
+            Director: requestDirector,
+            Similar: requestSimilar
+          }
+          commit('UPDATE_MOVIE_DETAIL', allDetails)
+          console.log(allDetails)
+        }))
         .catch(err => {
           console.log(err)
         })
+      
     },
     storeLoginUser: function ({ commit }, userInfo) {
       commit('STORE_LOGIN_USER', userInfo)

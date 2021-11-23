@@ -84,8 +84,6 @@
 
 
 <script>
-// import _ from 'lodash'
-
 export default {
     name: 'Carousel',
     props: {
@@ -104,13 +102,6 @@ export default {
           return `https://image.tmdb.org/t/p/original/${carouselItem.poster_path}`
         } 
       }         
-    },
-    computed: {
-        // carouselItems: function () {
-        //     const picks = _.sampleSize(this.movieItems, 5)
-        //     // console.log(picks)
-        //     return picks
-        // },
     },
     filters: {
       getYear: function (string) {

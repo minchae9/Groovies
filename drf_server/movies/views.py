@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from django.shortcuts import get_list_or_404, get_object_or_404
 from movies.serializers import MovieListSerializer, MovieSerializer, CommentSerializer, RatingSerializer, ActorSerializer, DirectorSerializer, SimilarSerializer
-from .models import Comment, Rating, Movie, Similar, Cart
+from .models import Actor, Director, Comment, Rating, Movie, Similar, Cart
 import random
 
 
@@ -74,10 +74,32 @@ def movie_list(request):
 # 영화 세부정보
 @api_view(['GET'])
 def movie_detail(request, movie_pk):
-    movie = get_object_or_404(Movie, pk=movie_pk)
+    movie = Movie.objects.get(pk=movie_pk)
     serializer = MovieSerializer(movie)
     return Response(serializer.data)
 
+# 감독 정보
+@api_view(['GET'])
+def movie_actor(request, movie_pk):
+    actor = Actor.objects.filter(movie_id=movie_pk)
+    serializer = ActorSerializer(actor, many=True)
+    return Response(serializer.data)
+
+
+# 배우 정보
+@api_view(['GET'])
+def movie_director(request, movie_pk):
+    director = Director.objects.filter(movie_id=movie_pk)
+    serializer = DirectorSerializer(director, many=True)
+    return Response(serializer.data)
+
+
+# 관련 영화 정보
+@api_view(['GET'])
+def movie_similar(request, movie_pk):
+    similar = Similar.objects.filter(original_movie=movie_pk)
+    serializer = SimilarSerializer(similar, many=True)
+    return Response(serializer.data)
 
 
 # 별점    
@@ -144,6 +166,7 @@ def recommendation(request):
     return Response({"recommendations": serializer1.data, "carousel_items": serializer2.data})
 
 
+# 찜하기
 @api_view(['POST'])
 def add_cart(request, movie_pk):
     if request.user.is_authenticated:

@@ -16,13 +16,6 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only_fields = ('user', 'movie', 'like_comment_users',)
 
 
-class MovieSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Movie
-        fields = '__all__'
-
-
 class RatingSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -49,4 +42,11 @@ class SimilarSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Similar
+        fields = '__all__'
+
+
+class MovieSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Movie
         fields = '__all__'
