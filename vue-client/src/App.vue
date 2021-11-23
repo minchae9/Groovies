@@ -11,7 +11,7 @@
         <router-link :to="{ name: 'Login' }">로그인</router-link>
       </div>
       <div v-if="login">
-        {{ loginUserInfo.username }}님 환영합니다.
+        <b>{{ loginUserNickname }}</b>님 환영합니다.
       </div>
       <div v-if="login">
         <router-link to="#" @click.native="logout">로그아웃</router-link>
@@ -43,6 +43,7 @@ export default {
       localStorage.removeItem('jwt')
       this.login=false
       this.$router.push({ name: 'Home' })
+      this.$router.go()
     },
     // 현재 로그인한 유저 정보 받기
     getUserInfo: function () {
@@ -56,16 +57,17 @@ export default {
       this.userInfo.user_id = result.user_id
       this.userInfo.username = result.username
       // console.log(this.userInfo)
-      this.$store.dispatch('storeLoginUser', this.userInfo)   
+      this.$store.dispatch('storeLoginUser', this.userInfo)
+      this.getUserOthers()
       }    
     },
-    getUserNickname: function () {
+    getUserOthers: function () {
       axios({
         method: 'get',
         url: `http://127.0.0.1:8000/accounts/profile/${this.userInfo.user_id}/`
       })
         .then((res) => {
-          this.$store.dispatch('getNickname', res.data.nickname)
+          this.$store.dispatch('getUserOthers', res.data.nickname, res.data.profile_path)
         }) 
         .catch(err => {
           console.log(err)
@@ -78,7 +80,7 @@ export default {
     if (token) {
       this.login = true
       this.getUserInfo()
-      this.getUserNickname()
+      this.getUserOthers()
     }
   },
   watch: {
@@ -91,6 +93,9 @@ export default {
   computed: {
     loginUserInfo: function () {
       return this.$store.state.loginUser
+    },
+    loginUserNickname: function () {
+      return this.$store.state.loginUser_nickname
     }
   },
 }

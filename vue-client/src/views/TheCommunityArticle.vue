@@ -12,8 +12,8 @@
           <div>
             <p>작성  |  {{ article.created_at | convertFormat }}</p>
             <p>수정  |  {{ article.updated_at | convertFormat }}</p>
-            <button @click="updateArticle(article)" v-if="article.user === userInfo.user_id">수정</button>
-            <button @click="deleteArticle(article)" v-if="article.user === userInfo.user_id">삭제</button>
+            <button @click="updateArticle(article)" v-if="(userInfo && article.user === userInfo.user_id)">수정</button>
+            <button @click="deleteArticle(article)" v-if="(userInfo && article.user === userInfo.user_id)">삭제</button>
           </div>
         </div>
         <div id="article-content-box">
@@ -42,7 +42,7 @@
             <div class="comment-username">{{ comment.username }}</div>
             <div class="comment-content">{{ comment.content }}</div>
             <div class="comment-created-at">{{ comment.created_at | convertFormat }}</div>
-            <button @click="deleteComment(comment)" v-if="comment.user === userInfo.user_id">삭제</button>
+            <button @click="deleteComment(comment)" v-if="(userInfo && comment.user === userInfo.user_id)">삭제</button>
           </li>
         </ul>
         <div v-else>
@@ -194,7 +194,7 @@ export default {
     },
     computed: {
       login: function () {
-        return (this.$store.state.loginUser != null)
+        return (this.$store.state.loginUser !== null)
       },
       userInfo: function () {
         return this.$store.state.loginUser

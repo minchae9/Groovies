@@ -4,7 +4,7 @@
         class="search-bar"
         placeholder="검색어를 입력하세요" 
         :value="searchKeyword" @input="updateInput" 
-        @keypress.enter="onSearch">
+        @keypress.enter="onSearch" autofocus>
       <button @click="onSearch" class="search-button">
           <img src="@/assets/search.png" class="search-icon">
       </button>
@@ -53,7 +53,7 @@ export default {
             if (searchInput && value) searchInput.value = value
         },
         deep: true,
-        immediate: true
+        immediate: true,
       }
     },  
 }

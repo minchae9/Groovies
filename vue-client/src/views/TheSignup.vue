@@ -1,11 +1,22 @@
 <template>
   <div id="signup">
-    <!-- <img src="@/assets/logo.png" alt="logo" class="logo"> -->
     <div class="page-title">
-      <div>회원가입</div> 
+      <div v-if="this.$store.state.loginUser">회원 정보 수정</div> 
+      <div v-else>회원가입</div> 
       <div class="line"></div>
     </div>
     <div id="signup-form">
+      <div>
+        <p>프로필 사진</p>
+        <br>
+        <a href="#"><img :class="{ click: credentials.profile_path === 0 }" @click="setProfilePath(0)" src="@/assets/profile_img_0.jpg" alt="0번_프로필" class="profile"></a>
+        <a href="#"><img :class="{ click: credentials.profile_path === 1 }" @click="setProfilePath(1)" src="@/assets/profile_img_1.jpg" alt="1번_프로필" class="profile"></a>
+        <a href="#"><img :class="{ click: credentials.profile_path === 2 }" @click="setProfilePath(2)" src="@/assets/profile_img_2.jpg" alt="2번_프로필" class="profile"></a>
+        <a href="#"><img :class="{ click: credentials.profile_path === 3 }" @click="setProfilePath(3)" src="@/assets/profile_img_3.jpg" alt="3번_프로필" class="profile"></a>
+        <a href="#"><img :class="{ click: credentials.profile_path === 4 }" @click="setProfilePath(4)" src="@/assets/profile_img_4.jpg" alt="4번_프로필" class="profile"></a>
+      </div>
+      <br>
+      <br>
       <div>
         <label for="nickname">닉네임:</label>
         <input v-if="this.$store.state.loginUser" type="text" id="nickname" v-model="credentials.nickname" :class="{ red: checkValidNickname }" :placeholder="this.$store.state.loginUser_nickname">
@@ -36,7 +47,7 @@
         <input type="checkbox" id="agree">
         <label for="agree" style="cursor: pointer;">회원가입에 동의합니다!</label>
       </div>
-      <button v-if="this.$store.state.loginUser" @click="update">회원정보 수정</button>
+      <button v-if="this.$store.state.loginUser !== null" @click="update">회원정보 수정</button>
       <button v-else @click="signup">회원가입</button>
     </div>
   </div>
@@ -54,6 +65,7 @@ export default {
             username: '',
             password: '',
             passwordConfirmation: '',
+            profile_path: null,
           },
           isInvalidPW: false,
           isNotSamePW: false,
@@ -72,6 +84,7 @@ export default {
             method: 'post',
             url: 'http://127.0.0.1:8000/accounts/signup/',
             data: {
+              profile_path: this.credentials.profile_path,
               nickname: this.credentials.nickname,
               username: this.credentials.username,
               password: this.credentials.password,
@@ -79,16 +92,22 @@ export default {
             }
           })
             .then(() => {
-              // console.log(res)
+              this.$router.push({ name: 'Login' })
             })
-            .catch(err => {
-              console.log(err)
+            .catch(() => {
+              this.$router.go()
             })
 
         } else {
           // 회원가입 불가능
           console.log('회원가입 불가! 정보 입력을 모두 완료해주세요.')
         }
+      },
+      // 프로필 사진
+      setProfilePath (num) {
+        this.credentials.profile_path = num
+        this.clickedImg = num
+        console.log(this.credentials.profile_path)
       },
       // 비밀번호
       checkValidPW: function () {
@@ -157,6 +176,7 @@ export default {
             url: `http://127.0.0.1:8000/accounts/profile/${this.$store.state.loginUser.user_id}/update/`,
             headers: { Authorization: `JWT ${localStorage.getItem('jwt')}` },
             data: {
+              profile_path: this.credentials.profile_path,
               nickname: this.credentials.nickname,
               password: this.credentials.password,
               passwordConfirmation: this.credentials.passwordConfirmation
@@ -174,6 +194,7 @@ export default {
             url: `http://127.0.0.1:8000/accounts/profile/${this.$store.state.loginUser.user_id}/update/`,
             headers: { Authorization: `JWT ${localStorage.getItem('jwt')}` },
             data: {
+              profile_path: this.credentials.profile_path,
               nickname: this.$store.state.loginUser_nickname,
               password: this.credentials.password,
               passwordConfirmation: this.credentials.passwordConfirmation
@@ -192,19 +213,29 @@ export default {
     created: function () {
       this.getAllUsername()
       this.getAllNickname()
+      this.credentials.profile_path = this.$store.state.loginUser_profile_path
     },
     computed:{
       checkValidUsername(){
-        let usedUsername = this.existingUsername.includes(this.credentials.username)
+        if (this.credentials.username.length > 0) {
+          let usedUsername = this.existingUsername.includes(this.credentials.username)
         // let apples = this.selectedProducts.includes("Apples")
         if (this.existingUsername.length > 0 && usedUsername) return true
         // if (this.selectedProducts.length === 1 && (apples || pears)) return true
         return false
+        } else {
+          return false
+        }
       },
       checkValidNickname(){
-        let usedNickname = this.existingNickname.includes(this.credentials.nickname)
-        if (this.existingNickname.length > 0 && usedNickname) return true
-        return false
+        if (this.credentials.nickname.length > 0) {
+          let usedNickname = this.existingNickname.includes(this.credentials.nickname)
+          if (this.existingNickname.length > 0 && usedNickname) return true
+          return false
+        } else {
+          return false
+        }
+        
       },
     },
 }
@@ -213,6 +244,18 @@ export default {
 <style>
   .invalid {
     color: red;
+  }
+
+  .click {
+    box-shadow: 0 0 0 0.9rem rgb(112,34,171, 0.5);
+  }
+
+  .profile {
+    width: 120px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin-right: 2rem;
   }
 
   .page-title {

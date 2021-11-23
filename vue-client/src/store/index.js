@@ -8,8 +8,9 @@ export default new Vuex.Store({
   state: {
     searchKeyword: '',
     selectedMovie: {},
-    loginUser: {},  // username과 user_id
+    loginUser: null,  // username과 user_id
     loginUser_nickname: '',
+    loginUser_profile_path: 0,
   },
   mutations: {
     ON_SEARCH: function (state, searchKeyword) {
@@ -25,8 +26,9 @@ export default new Vuex.Store({
     STORE_LOGIN_USER: function (state, userInfo) {
       state.loginUser = userInfo
     },
-    GET_NICKNAME: function (state, nickname) {
+    GET_USER_OTHERS: function (state, nickname, profile_path) {
       state.loginUser_nickname = nickname
+      state.loginUser_profile_path = profile_path
     }
   },
   actions: {
@@ -65,7 +67,7 @@ export default new Vuex.Store({
             Similar: requestSimilar
           }
           commit('UPDATE_MOVIE_DETAIL', allDetails)
-          console.log(allDetails)
+          // console.log(allDetails)
         }))
         .catch(err => {
           console.log(err)
@@ -75,8 +77,8 @@ export default new Vuex.Store({
     storeLoginUser: function ({ commit }, userInfo) {
       commit('STORE_LOGIN_USER', userInfo)
     },
-    getNickname: function ({ commit }, nickname) {
-      commit('GET_NICKNAME', nickname)
+    getUserOthers: function ({ commit }, nickname, profile_path) {
+      commit('GET_USER_OTHERS', nickname, profile_path)
     }
   },
   modules: {

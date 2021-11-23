@@ -26,7 +26,6 @@ export default {
           // console.log(res)
           this.username = res.data.username
           this.nickname = res.data.nickname
-          this.$store.dispatch('getNickname', this.nickname)
         })
         .catch(err => {
           console.log(err)
@@ -35,7 +34,7 @@ export default {
     methods: {
       updateProfile: function () {
         this.$router.push({ name: 'Signup' })
-        
+        this.$router.go()
       },
     },
 }
