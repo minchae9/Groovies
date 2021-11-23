@@ -6,17 +6,17 @@
         @click="moveToArticle(articleListItem.id)">
         {{ articleList ? articleListItem.title : null }}</span>
         <span class="article-list-item-user" 
-          @click="moveToUserProfile(articleListItem.user.user_id)">
-          {{ articleList ? articleListItem.username : null }}
+          @click="moveToUserProfile(articleListItem.user)">
+          {{ articleList ? articleListItem.nickname : null }}
         </span>
-        <span>{{ articleList ? articleListItem.created_at : null }}</span>
+        <span>{{ articleList ? articleListItem.created_at : null | convertFormat }}</span>
       </li>
       <!-- list -->
     </ul>
     <div v-else>
       <h2>첫 게시글을 남겨주세요.</h2>
     </div>
-    <button @click="createArticle">작성</button>
+    <button @click="createArticle">작성</button>  <!--게시글 작성 뷰로 연결되도록-->
   </div>
 </template>
 
@@ -27,7 +27,7 @@ export default {
     name: 'Community',
     data: function () {
       return {
-        articleList: [],
+        articleList: [],  // 배열. 각 원소에 id(article pk), title, user(user pk), username(아이디) 들어있음.
       }
     },
     methods: {
@@ -55,6 +55,11 @@ export default {
         .catch (err => {
           console.log(err.response)
         })
+    },
+    filters: {
+      convertFormat: function (string) {
+        return string? `${string.slice(0,4)}년 ${string.slice(5,7)}월 ${string.slice(8,10)}일 ${string.slice(11,16)}` : ''
+      }
     },
 
   }

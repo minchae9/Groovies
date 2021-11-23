@@ -10,7 +10,7 @@
         <input type="text" id="username" v-model="credentials.username">
       </div>
       <div>
-        <label for="id">비밀번호:</label>
+        <label for="password">비밀번호:</label>
         <input type="password" id="password" v-model="credentials.password"
           @keypress.enter="login(credentials)">
       </div>

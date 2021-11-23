@@ -7,34 +7,37 @@
     </div>
     <div id="signup-form">
       <div>
-        <label for="username">닉네임:</label>
-        <input type="text" id="username" v-model="credentials.username" :class="{ red: checkValidUsername }">
-        <p class="tag" v-if="credentials.username" v-show="!checkValidUsername">사용 가능한 닉네임입니다.</p>
-        <p class="tag invalid" v-if="credentials.username" v-show="checkValidUsername">이미 사용중인 닉네임입니다.</p>
+        <label for="nickname">닉네임:</label>
+        <input v-if="this.$store.state.loginUser" type="text" id="nickname" v-model="credentials.nickname" :class="{ red: checkValidNickname }" :placeholder="this.$store.state.loginUser_nickname">
+        <input v-else type="text" id="nickname" v-model="credentials.nickname" :class="{ red: checkValidNickname }">
+        <p class="tag" v-if="credentials.nickname" v-show="!checkValidNickname">사용 가능한 닉네임입니다.</p>
+        <p class="tag invalid" v-if="credentials.nickname" v-show="checkValidNickname">이미 사용중인 닉네임입니다.</p>
       </div>
       <div>
-        <label for="id">아이디:</label>
-        <input type="text" id="id" v-model="credentials.id" :class="{ red: checkValidId }">
-        <p class="tag" v-if="credentials.id" v-show="!checkValidId">사용 가능한 아이디입니다.</p>
-        <p class="tag invalid" v-if="credentials.id" v-show="checkValidId">이미 사용중인 아이디입니다.</p>
+        <label for="username">아이디:</label>
+        <input v-if="this.$store.state.loginUser" type="text" id="username" :value="this.$store.state.loginUser.username" :class="{ red: checkValidUsername }" readonly>
+        <input v-else type="text" id="username" v-model="credentials.username" :class="{ red: checkValidUsername }">
+        <p class="tag" v-if="credentials.username" v-show="!checkValidUsername">사용 가능한 아이디입니다.</p>
+        <p class="tag invalid" v-if="credentials.username" v-show="checkValidUsername">이미 사용중인 아이디입니다.</p>
       </div>
       <div>
-        <label for="id">비밀번호:</label>
+        <label for="password">비밀번호:</label>
         <input type="password" id="password" v-model="credentials.password" @input="[checkValidPW(), checkSamePW()]"
         :class="{ red: isInvalidPW }">
         <p class="tag">* 영문, 숫자를 모두 포함하여 8자리 이상</p>
       </div>
       <div>
-        <label for="id">비밀번호 확인:</label>
+        <label for="passwordConfirmation">비밀번호 확인:</label>
         <input type="password" id="passwordConfirmation" v-model="credentials.passwordConfirmation" 
         @input="[checkValidPW(), checkSamePW()]" :class="{ red: isNotSamePW }">
       </div>
       <p class="notice" :class="{ shown: isNotSamePW }">비밀번호가 일치하지 않습니다!</p>
-      <div>
+      <div v-if="!this.$store.state.loginUser">
         <input type="checkbox" id="agree">
         <label for="agree" style="cursor: pointer;">회원가입에 동의합니다!</label>
       </div>
-      <button @click="signup">회원가입</button>
+      <button v-if="this.$store.state.loginUser" @click="update">회원정보 수정</button>
+      <button v-else @click="signup">회원가입</button>
     </div>
   </div>
 </template>
@@ -47,21 +50,21 @@ export default {
     data: function () {
         return {
           credentials: {
+            nickname: '',
             username: '',
-            id: '',
             password: '',
             passwordConfirmation: '',
           },
           isInvalidPW: false,
           isNotSamePW: false,
-          existingId: [],
           existingUsername: [],
+          existingNickname: [],
         }
     },
     methods: {
       signup: function () {
         const agreed = document.querySelector('#agree').checked
-        if (!this.checkValidUsername && !this.checkValidId && !this.isInvalidPW && !this.isNotSamePW && agreed) {
+        if (!this.checkValidUsername && !this.checkValidNickname && !this.isInvalidPW && !this.isNotSamePW && agreed) {
           // 회원가입 가능
           // console.log(this.credentials)
           // console.log('회원가입!')
@@ -69,8 +72,8 @@ export default {
             method: 'post',
             url: 'http://127.0.0.1:8000/accounts/signup/',
             data: {
-              nickname: this.credentials.username,
-              username: this.credentials.id,
+              nickname: this.credentials.nickname,
+              username: this.credentials.username,
               password: this.credentials.password,
               passwordConfirmation: this.credentials.passwordConfirmation
             }
@@ -110,7 +113,7 @@ export default {
           this.isNotSamePW = false
         }
       },
-      getAllIDs: function () {
+      getAllUsername: function () {
         //axios
         axios({
           method: 'get',
@@ -122,14 +125,13 @@ export default {
             for (let i=0; i < res.data.length ; i++) {
               userList.push(res.data[i].username)
             }
-            this.existingId = userList
-            // console.log(this.existingUsername)
+            this.existingUsername = userList
           })
           .catch(err => {
             console.log(err)
           })
       },
-      getAllUsernames: function () {
+      getAllNickname: function () {
         //axios
         axios({
           method: 'get',
@@ -141,29 +143,67 @@ export default {
             for (let i=0; i < res.data.length ; i++) {
               userList.push(res.data[i].nickname)
             }
-            this.existingUsername = userList
-            // console.log(this.existingUsername)
+            this.existingNickname = userList
           })
           .catch(err => {
             console.log(err)
           })
       },
+      update: function () {
+        //axios
+        if (this.credentials.nickname !== '') {
+          axios({
+            method: 'put',
+            url: `http://127.0.0.1:8000/accounts/profile/${this.$store.state.loginUser.user_id}/update/`,
+            headers: { Authorization: `JWT ${localStorage.getItem('jwt')}` },
+            data: {
+              nickname: this.credentials.nickname,
+              password: this.credentials.password,
+              passwordConfirmation: this.credentials.passwordConfirmation
+            }
+          })
+            .then(() => {
+              this.$router.push({ name: 'UserProfile', params: { user_id: this.$store.state.loginUser.user_id }})
+            })
+            .catch(err => {
+              console.log(err)
+            })
+        } else {
+          axios({
+            method: 'put',
+            url: `http://127.0.0.1:8000/accounts/profile/${this.$store.state.loginUser.user_id}/update/`,
+            headers: { Authorization: `JWT ${localStorage.getItem('jwt')}` },
+            data: {
+              nickname: this.$store.state.loginUser_nickname,
+              password: this.credentials.password,
+              passwordConfirmation: this.credentials.passwordConfirmation
+            }
+          })
+            .then(() => {
+              this.$router.push({ name: 'UserProfile', params: { user_id: this.$store.state.loginUser.user_id }})
+            })
+            .catch(err => {
+              console.log(err)
+            })
+        }
+        
+      },
     },
     created: function () {
-      this.getAllIDs()
-      this.getAllUsernames()
+      this.getAllUsername()
+      this.getAllNickname()
     },
     computed:{
-      checkValidId(){
-        let usedId = this.existingId.includes(this.credentials.id)
+      checkValidUsername(){
+        let usedUsername = this.existingUsername.includes(this.credentials.username)
         // let apples = this.selectedProducts.includes("Apples")
-        if (this.existingId.length > 0 && usedId) return true
+        if (this.existingUsername.length > 0 && usedUsername) return true
         // if (this.selectedProducts.length === 1 && (apples || pears)) return true
         return false
       },
-      checkValidUsername(){
-        let usedUsername = this.existingUsername.includes(this.credentials.username)
-        if (this.existingUsername.length > 0 && usedUsername) return true
+      checkValidNickname(){
+        let usedNickname = this.existingNickname.includes(this.credentials.nickname)
+        if (this.existingNickname.length > 0 && usedNickname) return true
         return false
       },
     },

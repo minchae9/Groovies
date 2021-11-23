@@ -24,7 +24,7 @@
 </template>
 
 <script>
-// import axios from 'axios'
+import axios from 'axios'
 
 export default {
   name: 'App',
@@ -56,8 +56,17 @@ export default {
       this.userInfo.user_id = result.user_id
       this.userInfo.username = result.username
       // console.log(this.userInfo)
-      this.$store.dispatch('storeLoginUser', this.userInfo)
+      this.$store.dispatch('storeLoginUser', this.userInfo)   
       }    
+    },
+    getUserNickname: function () {
+      axios({
+        method: 'get',
+        url: `http://127.0.0.1:8000/accounts/profile/${this.userInfo.user_id}/`
+      })
+        .then((res) => {
+          this.$store.dispatch('getNickname', res.data.nickname)
+        }) 
     },
   },
   created: function () {
@@ -67,6 +76,7 @@ export default {
       this.login = true
     }
     this.getUserInfo()
+    this.getUserNickname()
   },
   watch: {
     $route (to, from){

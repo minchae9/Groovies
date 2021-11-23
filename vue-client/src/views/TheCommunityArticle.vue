@@ -5,9 +5,9 @@
         <h1>{{ article.title }}</h1>
         <div id="article-header">
           <div>
-            <img v-if="article.profile_path" :src="require(`@/assets/profile_img_${article.profile_path}.jpg`)" 
+            <img v-if="article.profile_path >= 0" :src="require(`@/assets/profile_img_${article.profile_path}.jpg`)" 
             class="profile-img" alt="profile_img">
-            {{ article.username }}
+            {{ article.nickname }}
           </div>
           <div>
             <p>작성  |  {{ article.created_at | convertFormat }}</p>
@@ -72,7 +72,7 @@ export default {
     name: 'CommunityArticle',
     data: function () {
       return {
-        article: {},
+        article: {},  // 게시글 정보 + 유저 id (as 'user), username, nickname, profile_path
         comments: [],
         commentInput: '',
         isLikeUser: false,
@@ -159,7 +159,6 @@ export default {
     },
     created: function () {
       const article_id = this.$route.params.article_id
-      // console.log(article_id)
       // axios
       axios({
         method: 'get',

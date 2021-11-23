@@ -4,10 +4,11 @@ from accounts.serializers import UserSerializer
 
 class ArticleListSerializer(serializers.ModelSerializer):
     username = serializers.CharField(read_only=True, source='user.username')
+    nickname = serializers.CharField(read_only=True, source='user.nickname')
     class Meta:
         model = Article
-        fields = ('id', 'title', 'user', 'created_at', 'username')
-        read_only_fields = ('user', 'created_at', 'username')
+        fields = ('id', 'title', 'user', 'created_at', 'username', 'nickname',)
+        read_only_fields = ('user', 'created_at', 'username', 'nickname',)
 
       
 class CommentSerializer(serializers.ModelSerializer):
@@ -22,7 +23,9 @@ class CommentSerializer(serializers.ModelSerializer):
 class ArticleSerializer(serializers.ModelSerializer):
     profile_path = serializers.IntegerField(read_only=True, source='user.profile_path')
     comment = CommentSerializer(many=True, read_only=True)
+    username = serializers.CharField(read_only=True, source='user.username')
+    nickname = serializers.CharField(read_only=True, source='user.nickname')
     class Meta:
         model = Article
         fields = '__all__'
-        read_only_fields = ('user', 'like_article_users',)
+        read_only_fields = ('user', 'like_article_users', 'username', 'nickname',)

@@ -8,7 +8,8 @@ export default new Vuex.Store({
   state: {
     searchKeyword: '',
     selectedMovie: {},
-    loginUser: {},
+    loginUser: {},  // username과 user_id
+    loginUser_nickname: '',
   },
   mutations: {
     ON_SEARCH: function (state, searchKeyword) {
@@ -24,6 +25,9 @@ export default new Vuex.Store({
     STORE_LOGIN_USER: function (state, userInfo) {
       state.loginUser = userInfo
     },
+    GET_NICKNAME: function (state, nickname) {
+      state.loginUser_nickname = nickname
+    }
   },
   actions: {
     onSearch: function ({ commit }, searchKeyword) {
@@ -53,6 +57,9 @@ export default new Vuex.Store({
     storeLoginUser: function ({ commit }, userInfo) {
       commit('STORE_LOGIN_USER', userInfo)
     },
+    getNickname: function ({ commit }, nickname) {
+      commit('GET_NICKNAME', nickname)
+    }
   },
   modules: {
   }

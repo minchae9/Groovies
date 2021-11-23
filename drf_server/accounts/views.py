@@ -24,7 +24,7 @@ def signup(request):
     nickname = request.data.get('nickname')
     if get_user_model().objects.all().filter(nickname=nickname).exists():
         return Response({'error': '이미 사용중인 닉네임입니다.'}, status=status.HTTP_400_BAD_REQUEST)
-
+    
     #1-4. 유저네임 중복 여부 체크
     username = request.data.get('username')
     if get_user_model().objects.all().filter(username=username).exists():
@@ -43,10 +43,11 @@ def signup(request):
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+# 회원정보 수정
 @api_view(['PUT'])
-def update(request):
+def update(request, profile_pk):
     #0. 기존 사용자 정보
-    user_info = get_object_or_404(get_user_model(), pk=request.user.pk)
+    user_info = get_user_model().objects.get(pk=profile_pk)
     #1-1. Client에서 온 데이터를 받아서
     password = request.data.get('password')
     password_confirmation = request.data.get('passwordConfirmation')
@@ -57,8 +58,9 @@ def update(request):
 
     #1-3. 닉네임 중복 여부 체크
     nickname = request.data.get('nickname')
-    if get_user_model().objects.all().filter(nickname=nickname).exists():
-        return Response({'error': '이미 사용중인 닉네임입니다.'}, status=status.HTTP_400_BAD_REQUEST)
+    if nickname != user_info.nickname:
+        if get_user_model().objects.filter(nickname=nickname).exists():
+            return Response({'error': '이미 사용중인 닉네임입니다.'}, status=status.HTTP_400_BAD_REQUEST)
 
     #2. UserSerializer를 통해 데이터 직렬화
     serializer = UserSerializer(data=request.data, instance=user_info)
@@ -130,8 +132,17 @@ def my_articles(request):
     return Response({'error': '로그인이 필요한 기능입니다.'})
 
 
+# 전체 유저정보 조회
 @api_view(['GET'])
-def profile(request):
+def all_profile(request):
     users = get_user_model().objects.all()
     serializer = UserSerializer(users, many=True)
+    return Response(serializer.data)
+
+
+# 개별 프로필 조회
+@api_view(['GET'])
+def profile(request, profile_pk):
+    user = get_user_model().objects.get(pk=profile_pk)
+    serializer = UserSerializer(user)
     return Response(serializer.data)
