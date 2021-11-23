@@ -23,8 +23,6 @@ export default {
     },
     methods: {
         onSearch: function () {
-            // console.log('onSearch! method', this.searchKeyword)
-            // console.log('route', this.$route)
             if (this.searchKeyword && this.searchKeyword !== this.$route.params.keyword) {
                 this.$router.push({ name: 'Search', params: { keyword : this.searchKeyword }})
                 .then(() => {

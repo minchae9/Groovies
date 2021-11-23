@@ -78,7 +78,7 @@ def movie_detail(request, movie_pk):
     serializer = MovieSerializer(movie)
     return Response(serializer.data)
 
-# 감독 정보
+# 배우 정보
 @api_view(['GET'])
 def movie_actor(request, movie_pk):
     actor = Actor.objects.filter(movie_id=movie_pk)
@@ -86,7 +86,7 @@ def movie_actor(request, movie_pk):
     return Response(serializer.data)
 
 
-# 배우 정보
+# 감독 정보
 @api_view(['GET'])
 def movie_director(request, movie_pk):
     director = Director.objects.filter(movie_id=movie_pk)
@@ -131,6 +131,7 @@ def rating(request, movie_pk):
             if serializer.is_valid(raise_exception=True):
                 serializer.save(movie=movie, user=request.user)
                 return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(None)
 
 
 # 검색

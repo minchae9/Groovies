@@ -26,6 +26,9 @@ export default new Vuex.Store({
     STORE_LOGIN_USER: function (state, userInfo) {
       state.loginUser = userInfo
     },
+    LOGOUT: function (state) {
+      state.loginUser = {}
+    },
     GET_USER_OTHERS: function (state, nickname, profile_path) {
       state.loginUser_nickname = nickname
       state.loginUser_profile_path = profile_path
@@ -76,6 +79,9 @@ export default new Vuex.Store({
     },
     storeLoginUser: function ({ commit }, userInfo) {
       commit('STORE_LOGIN_USER', userInfo)
+    },
+    logout: function ({ commit }) {
+      commit('LOGOUT')
     },
     getUserOthers: function ({ commit }, nickname, profile_path) {
       commit('GET_USER_OTHERS', nickname, profile_path)

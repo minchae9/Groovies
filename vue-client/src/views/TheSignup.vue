@@ -19,22 +19,21 @@
       <br>
       <div>
         <label for="nickname">닉네임:</label>
-        <input v-if="this.$store.state.loginUser" type="text" id="nickname" v-model="credentials.nickname" :class="{ red: checkValidNickname }" :placeholder="this.$store.state.loginUser_nickname">
+        <input v-if="this.$store.state.loginUser" type="text" id="nickname" v-model="credentials.nickname" :class="{ red: checkValidNickname }" :placeholder="this.nickname">
         <input v-else type="text" id="nickname" v-model="credentials.nickname" :class="{ red: checkValidNickname }">
         <p class="tag" v-if="credentials.nickname" v-show="!checkValidNickname">사용 가능한 닉네임입니다.</p>
-        <p class="tag invalid" v-if="credentials.nickname" v-show="checkValidNickname">이미 사용중인 닉네임입니다.</p>
+        <p class="tag invalid" v-if="credentials.nickname" v-show="checkValidNickname && !nickname">이미 사용중인 닉네임입니다.</p>
       </div>
       <div>
         <label for="username">아이디:</label>
-        <input v-if="this.$store.state.loginUser" type="text" id="username" :value="this.$store.state.loginUser.username" :class="{ red: checkValidUsername }" readonly>
+        <input v-if="this.$store.state.loginUser" type="text" id="username" :value="this.username" :class="{ red: checkValidUsername }" readonly>
         <input v-else type="text" id="username" v-model="credentials.username" :class="{ red: checkValidUsername }">
         <p class="tag" v-if="credentials.username" v-show="!checkValidUsername">사용 가능한 아이디입니다.</p>
-        <p class="tag invalid" v-if="credentials.username" v-show="checkValidUsername">이미 사용중인 아이디입니다.</p>
+        <p class="tag invalid" v-if="credentials.username" v-show="checkValidUsername && !username">이미 사용중인 아이디입니다.</p>
       </div>
       <div>
         <label for="password">비밀번호:</label>
-        <input type="password" id="password" v-model="credentials.password" @input="[checkValidPW(), checkSamePW()]"
-        :class="{ red: isInvalidPW }">
+        <input type="password" id="password" v-model="credentials.password" @input="[checkValidPW(), checkSamePW()]" :class="{ red: isInvalidPW }">
         <p class="tag">* 영문, 숫자를 모두 포함하여 8자리 이상</p>
       </div>
       <div>
@@ -60,13 +59,17 @@ export default {
     name: 'Signup',
     data: function () {
         return {
-          credentials: {
+          credentials: {  // 새 정보
             nickname: '',
             username: '',
             password: '',
             passwordConfirmation: '',
             profile_path: null,
           },
+          user_id: '',
+          username: '',  // 기존 사용자 아이디
+          nickname: '', // 기존 사용자 닉네임
+          profile_path: '', // 기존 사용자 프로필 사진
           isInvalidPW: false,
           isNotSamePW: false,
           existingUsername: [],
@@ -77,9 +80,6 @@ export default {
       signup: function () {
         const agreed = document.querySelector('#agree').checked
         if (!this.checkValidUsername && !this.checkValidNickname && !this.isInvalidPW && !this.isNotSamePW && agreed) {
-          // 회원가입 가능
-          // console.log(this.credentials)
-          // console.log('회원가입!')
           axios({
             method: 'post',
             url: 'http://127.0.0.1:8000/accounts/signup/',
@@ -99,7 +99,6 @@ export default {
             })
 
         } else {
-          // 회원가입 불가능
           console.log('회원가입 불가! 정보 입력을 모두 완료해주세요.')
         }
       },
@@ -107,7 +106,7 @@ export default {
       setProfilePath (num) {
         this.credentials.profile_path = num
         this.clickedImg = num
-        console.log(this.credentials.profile_path)
+        // console.log(this.credentials.profile_path)
       },
       // 비밀번호
       checkValidPW: function () {
@@ -170,20 +169,21 @@ export default {
       },
       update: function () {
         //axios
-        if (this.credentials.nickname !== '') {
+        if (this.credentials.nickname) {
           axios({
             method: 'put',
-            url: `http://127.0.0.1:8000/accounts/profile/${this.$store.state.loginUser.user_id}/update/`,
+            url: `http://127.0.0.1:8000/accounts/profile/${this.user_id}/update/`,
             headers: { Authorization: `JWT ${localStorage.getItem('jwt')}` },
             data: {
               profile_path: this.credentials.profile_path,
+              username: this.username,
               nickname: this.credentials.nickname,
               password: this.credentials.password,
               passwordConfirmation: this.credentials.passwordConfirmation
             }
           })
             .then(() => {
-              this.$router.push({ name: 'UserProfile', params: { user_id: this.$store.state.loginUser.user_id }})
+              this.$router.push({ name: 'UserProfile', params: { user_id: this.user_id }})
             })
             .catch(err => {
               console.log(err)
@@ -191,17 +191,18 @@ export default {
         } else {
           axios({
             method: 'put',
-            url: `http://127.0.0.1:8000/accounts/profile/${this.$store.state.loginUser.user_id}/update/`,
+            url: `http://127.0.0.1:8000/accounts/profile/${this.user_id}/update/`,
             headers: { Authorization: `JWT ${localStorage.getItem('jwt')}` },
             data: {
               profile_path: this.credentials.profile_path,
-              nickname: this.$store.state.loginUser_nickname,
+              username: this.username,
+              nickname: this.nickname,
               password: this.credentials.password,
               passwordConfirmation: this.credentials.passwordConfirmation
             }
           })
             .then(() => {
-              this.$router.push({ name: 'UserProfile', params: { user_id: this.$store.state.loginUser.user_id }})
+              this.$router.push({ name: 'UserProfile', params: { user_id: this.user_id }})
             })
             .catch(err => {
               console.log(err)
@@ -211,11 +212,36 @@ export default {
       },
     },
     created: function () {
+      // 유저 정보 추출 (1)
+      if (localStorage.getItem('jwt')) {
+        const JWTtoken = localStorage.getItem('jwt')
+        const base64Payload = JWTtoken.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE 
+        const payload = Buffer.from(base64Payload, 'base64'); 
+        const result = JSON.parse(payload.toString()) 
+        this.user_id = result.user_id
+        this.username = result.username
+      }
+      // 유저 정보 (2)
+      axios({
+        method: 'get',
+        url: `http://127.0.0.1:8000/accounts/profile/${this.user_id}/`
+      })
+        .then(res => {
+          // this.username = res.data.username
+          this.nickname = res.data.nickname
+          this.profile_path = res.data.profile_path
+          this.credentials.profile_path = res.data.profile_path // 기존 사용자 정보 등록
+        })
+        .catch(err => {
+          console.log(err)
+        })
+
+
       this.getAllUsername()
       this.getAllNickname()
       this.credentials.profile_path = this.$store.state.loginUser_profile_path
     },
-    computed:{
+    computed: {
       checkValidUsername(){
         if (this.credentials.username.length > 0) {
           let usedUsername = this.existingUsername.includes(this.credentials.username)

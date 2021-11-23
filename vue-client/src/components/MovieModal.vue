@@ -2,26 +2,37 @@
   <div class="modal fade" data-backdrop="static" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
+        <!-- header -->
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">
             {{ selectedMovie.title }} ({{ selectedMovie.original_title }})
-            <button class="cart-button" @click="toggleCart">
-              <img src="@/assets/cart_add_2.svg" v-if="!cart_added" alt="cart_add" class="cart-button-icon">
-              <img src="@/assets/cart_remove.png" v-if="cart_added" alt="cart_add" class="cart-button-icon">
+            <!-- cart button -->
+            <button @click="toggleCart" class="cart-button" :data-bs-dismiss="ratingModal" :aria-label="ratingClose">
+              <img src="@/assets/cart_add_2.svg" v-if="!isAddedToCart" alt="cart_add" class="cart-button-icon">
+              <img src="@/assets/cart_remove.png" v-if="isAddedToCart" alt="cart_add" class="cart-button-icon">
             </button>
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+        <!-- sub-header -->
         <div class="modal-sub-header">
           <div>
             {{ selectedMovie.release_date | getYear }}년 <span class="split-bar">|</span>
             <span v-if="selectedMovie.runtime">{{ selectedMovie.runtime | convertToTime }}</span> <span class="split-bar">|</span>
-            <span>
-              <img src="@/assets/star_empty.svg" class="detail-star-icon">
-              <img src="@/assets/star_empty.svg" class="detail-star-icon">
-              <img src="@/assets/star_empty.svg" class="detail-star-icon">
-              <img src="@/assets/star_empty.svg" class="detail-star-icon">
-              <img src="@/assets/star_empty.svg" class="detail-star-icon">
+            <!-- rating -->
+            <span class="rating" @click="rate" :data-bs-dismiss="ratingModal" :aria-label="ratingClose">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.07 20.23"
+              v-for="(star_src, idx) in new Array(5)" :key="idx"
+              class="detail-star-icon" :data-score="Number(idx)+1">
+                  <defs>
+                  </defs>
+                  <g id="레이어_2" data-name="레이어 2">
+                  <g id="레이어_1-2" data-name="레이어 1">
+                  <path class="cls-1" 
+                  @click="rate" :data-bs-dismiss="ratingModal" :aria-label="ratingClose" :data-score="Number(idx)+1"
+                  :class="{ 'fullStar': idx < ratingScore }" 
+                  d="M11.81,1.29l2,4.05a1.44,1.44,0,0,0,1.07.78l4.47.65a1.42,1.42,0,0,1,.79,2.43l-3.23,3.15a1.41,1.41,0,0,0-.41,1.26l.76,4.45a1.42,1.42,0,0,1-2.06,1.5l-4-2.1a1.42,1.42,0,0,0-1.33,0l-4,2.1a1.42,1.42,0,0,1-2.07-1.5l.77-4.45a1.47,1.47,0,0,0-.41-1.26L.93,9.2a1.43,1.43,0,0,1,.79-2.43l4.47-.65a1.44,1.44,0,0,0,1.07-.78l2-4A1.43,1.43,0,0,1,11.81,1.29Z"/></g></g>
+              </svg>
             </span>
           </div>
           <div>
@@ -34,6 +45,7 @@
 
         <hr style="margin: 1rem; color: rgba(165, 165, 165, 0.5);">
 
+        <!-- body -->
         <div class="modal-body">
           <div id="movie-trailer-box" v-if="trailer_src">
             <iframe id="movie-trailer" :src="trailer_src" title="YouTube video player" frameborder="0" 
@@ -41,52 +53,214 @@
             allowfullscreen></iframe>
           </div>
           <div class="movie-info">
-            <img :src="poster_path" :alt="selectedMovie.title" class="poster">
+            <div class="movie-info-left">
+              <img :src="poster_path" :alt="selectedMovie.title" class="poster">
+              <div class="staffs">
+                <div>
+                  <span class="movie-info-left-title">감독</span> <span class="split-bar">|</span> {{ directors | getNames }}
+                </div>
+                <div>
+                  <span class="movie-info-left-title">배우</span> <span class="split-bar">|</span> {{ actors | getNames }}
+                </div>
+              </div>
+            </div>
             <div v-if="selectedMovie.overview" class="movie-info-overview">
               <h6>줄거리</h6>
               <p>{{ selectedMovie.overview }}</p>
             </div>
           </div>
         </div>
+
+        <!-- footer -->
         <div class="modal-footer">
           <button type="button" class="btn btn-primary" @click="moveToDetail" data-bs-dismiss="modal" aria-label="Close">
             상세정보 <img src="@/assets/arrow.png" class="arrow">
           </button>
         </div>
+
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import axios from 'axios'
 import { mapState } from 'vuex'
 
 export default {
     name: 'MovieModal',
     data: function () {
         return {
-          selectedMovie_posterpath: '',
-          cart_added: false,
+          isAddedToCart: false,
+          myCart: [],
+          ratingModal: '',
+          ratingClose: '',
+          ratingScore: 0,
+          directors: [],
+          actors: [],
         }
     },
     methods: {
       moveToDetail: function () {
         this.$router.push({ name: 'MovieDetail',  params: { movie_id: this.selectedMovie.id }})
       },
+      setToken: function () {
+        const token = localStorage.getItem('jwt')
+        const config = {
+          Authorization: `JWT ${token}`
+        }
+        return config
+      },
+
       toggleCart: function () {
         // console.log(this.loginUser)
         // console.log('movie', this.selectedMovie)
-        if (this.loginUser) {
-          this.cart_added = !this.cart_added
-
-          //axios
+        if (this.loginUser.user_id) {
+          // 로그인한 사용자면
+          axios({
+            method: 'post',
+            url: `http://127.0.0.1:8000/movies/${this.selectedMovie.id}/cart/`,
+            headers: this.setToken()
+          })
+          .then(() => {
+            this.updateCartState()
+          })
+          .catch(err => {
+            console.log(err)
+          })
         } else {
+          this.$router.push({ name: 'Login' })
+        }
+      },
+      rate: function (event) {
+        if (this.loginUser.user_id) {
+          // 로그인된 상태면
+          const score = event.target.dataset.score
+
+          if (this.ratingScore > 0) {
+            // 이미 줬던 점수가 있으면 -> 수정 (put)
+              axios({
+                method: 'put',
+                url: `http://127.0.0.1:8000/movies/${this.selectedMovie.id}/rating/`,
+                headers: this.setToken(),
+                data: { rate : score },
+              })
+              .then(() => {
+                this.updateRatingState()
+              })
+              .catch(err => {
+                console.log(err)
+              })
+
+          } else {
+            // 준 점수가 없으면 -> 새로 등록 (post)
+            axios({
+              method: 'post',
+              url: `http://127.0.0.1:8000/movies/${this.selectedMovie.id}/rating/`,
+              headers: this.setToken(),
+              data: { rate : score },
+            })
+            .then(() => {
+              this.updateRatingState()
+            })
+            .catch(err => {
+              console.log(err)
+            })
+          }
+        } else {
+          // 로그인을 안했으면
           this.$router.push({ name: 'Login' })
         }
       },
       moveToSearch: function (genre) {
         this.$router.push({name: 'Search', params: {keyword: genre}})
         this.$store.dispatch('onSearch', genre)
+      },
+      updateCartState: function () {
+        // cart data
+        axios({
+          method: 'get',
+          url: `http://127.0.0.1:8000/accounts/mycart/`,
+          headers: this.setToken()
+        })
+        .then((res) => {
+          this.myCart = res.status === 204? [] : res.data
+          this.isAddedToCart =  this.myCart.map(item => item.id).includes(this.selectedMovie.id) ? true : false
+        })
+        .catch(err => {
+          console.log(err)
+        })
+      },
+      updateRatingState: function () {
+        // cart data
+        axios({
+          method: 'get',
+          url: `http://127.0.0.1:8000/movies/${this.selectedMovie.id}/rating/`,
+          headers: this.setToken()
+        })
+        .then((res) => {
+          this.ratingScore = ((res.status >= 200 && res.status <= 202) && res.data.rate) ? res.data.rate : 0
+        })
+        .then(() => {
+          const stars = document.querySelectorAll('.detail-star-icon')
+          stars.forEach((item, idx) => {
+            if (idx < this.ratingScore) {
+              item.classList.add('fullStar')
+            } else {
+              item.classList.remove('fullStar')
+            }
+          })
+        })
+        .catch(err => {
+          if (err.response.status === 404) {
+            this.ratingScore = 0
+          } else {
+            console.log(err)
+          }
+        })
+      },
+      updateLoginState: function (user) {
+        if (user.user_id) {
+          //ratings 버튼
+          this.ratingModal = ''
+          this.ratingClose = ''
+        } else {
+          //ratings 버튼
+          this.ratingModal = 'modal'
+          this.ratingClose = 'Close'
+        }
+      },
+      updateStates: function () {
+        this.updateLoginState(this.loginUser)
+        this.updateCartState()
+        this.updateRatingState()
+      },
+      getDirectors: function () {
+        axios({
+          method: 'get',
+          url: `http://127.0.0.1:8000/movies/${this.selectedMovie.id}/director/`,
+        })
+        .then((res) => {
+          console.log('director axios res!!', res)
+          // this.ratingScore =  res.data.rate) ? res.data.rate : 0
+          this.directors = res.data
+        })
+        .catch(err => {
+          console.log(err)
+        })
+      },
+      getActors: function () {
+        axios({
+          method: 'get',
+          url: `http://127.0.0.1:8000/movies/${this.selectedMovie.id}/actor/`,
+        })
+        .then((res) => {
+          // console.log('actor axios res!!', res)
+          this.actors = res.data
+        })
+        .catch(err => {
+          console.log(err)
+        })
       },
     },
     filters: {
@@ -97,7 +271,10 @@ export default {
       },
       getYear: function (string) {
         return string ? string.slice(0,4) : ''
-      }
+      },
+      getNames: function (arr) {
+        return arr.map(person => person.name).join(', ')
+      },
     },
     computed: {
       ...mapState([
@@ -113,6 +290,21 @@ export default {
       splited_genres: function () {
         return this.selectedMovie.genres ? this.selectedMovie.genres.split(', ') : []
       },
+    },
+    watch: {
+      loginUser: function () {
+        this.updateStates()
+      },
+      selectedMovie: function () {
+        this.updateStates()
+        this.getDirectors()
+        this.getActors()
+      },
+    },
+    created: function () {
+      if (this.selectedMovie.id) {
+        this.updateStates()
+      }
     },
 }
 </script>
@@ -157,6 +349,10 @@ export default {
 
   .modal-sub-header > div:first-child {
     padding-bottom: 0.5rem;
+  }
+
+  .rating {
+    cursor: pointer;
   }
 
   .genre-button {
@@ -244,8 +440,18 @@ export default {
     padding-top: 1rem;
   }
 
-  .movie-info > .poster {
+  .movie-info .poster {
     margin-right: 1rem;
+    margin-bottom: 1rem;
+  }
+
+   .movie-info-left {
+    text-align: left;
+    font-size: 0.875rem;
+  }
+
+  .movie-info-left-title {
+    font-family: scd6;
   }
 
   .movie-info-overview {
@@ -263,10 +469,21 @@ export default {
     margin: 0;
   }
 
+  .staffs {
+    margin-right: 1rem;
+  }
+
   .poster {
     height: 300px;
     width: 210px;
     object-fit: cover;
   }
+
+   /* star */
+  .cls-1{fill:none;stroke:#fbb03b;stroke-linecap:round;stroke-miterlimit:10;}
+  .fullStar {
+    fill: #fbb03b;
+  }
+
 
 </style>

@@ -14,8 +14,8 @@
         <b>{{ loginUserNickname }}</b>님 환영합니다.
       </div>
       <div v-if="login">
+        <router-link v-if="login" :to="{ name: 'UserProfile', params: { user_id: loginUserInfo.user_id }}">마이페이지</router-link> |
         <router-link to="#" @click.native="logout">로그아웃</router-link>
-        <router-link v-if="login" :to="{ name: 'UserProfile', params: { user_id: loginUserInfo.user_id }}">마이페이지</router-link>
       </div>
     </div>
     <router-view id="content" @login="login=true" @getUserInfo="getUserInfo"/>
@@ -41,14 +41,15 @@ export default {
   methods: {
     logout: function () {
       localStorage.removeItem('jwt')
-      this.login=false
-      this.$router.push({ name: 'Home' })
-      this.$router.go()
+        this.login=false
+        this.$store.dispatch('logout')
+        this.$router.push({ name: 'Home' })
     },
+
     // 현재 로그인한 유저 정보 받기
     getUserInfo: function () {
       if (localStorage.getItem('jwt')) {
-        // 유저 정보 추출
+      // 유저 정보 추출
       const JWTtoken = localStorage.getItem('jwt')
       const base64Payload = JWTtoken.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE 
       const payload = Buffer.from(base64Payload, 'base64'); 
