@@ -59,7 +59,7 @@ export default new Vuex.Store({
           const requestDirector = responses[2].data
           const requestSimilar = responses[3].data
           const allDetails = {
-            MovieDetails: requestDetails,
+            ...requestDetails,
             Actor: requestActor,
             Director: requestDirector,
             Similar: requestSimilar

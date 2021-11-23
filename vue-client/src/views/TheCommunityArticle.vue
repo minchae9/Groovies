@@ -111,6 +111,7 @@ export default {
           url: `http://127.0.0.1:8000/community/${this.article.id}/like/`,
           headers: { Authorization : `JWT ${localStorage.getItem('jwt')}`}
         })
+          .then(() => {})
           .catch(err => {
             console.log(err)
           })

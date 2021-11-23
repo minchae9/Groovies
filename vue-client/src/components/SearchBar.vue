@@ -42,27 +42,20 @@ export default {
         }
     },
     created: function () {
-        // console.log('created searchbar')
         if (/^\/search\//.test(this.$route.path)) {
-            // console.log('if created')
             this.searchKeyword = this.$store.state.searchKeyword
         }
     },
     watch: {
-        // searchKeyword: function () {
-        //     const searchInput = document.querySelector('#SearchInput')
-        //     searchInput.target.value = this.searchKeyword
-        // },
         '$route.params.keyword': {
-            handler(value) {
-                const searchInput = document.querySelector('#SearchInput')
-                searchInput.value = value
-            },
-            deep: true,
-            immediate: true
-        }
-
-    },    
+        handler(value) {
+            const searchInput = document.querySelector('#SearchInput')
+            if (searchInput && value) searchInput.value = value
+        },
+        deep: true,
+        immediate: true
+      }
+    },  
 }
 </script>
 

@@ -67,6 +67,9 @@ export default {
         .then((res) => {
           this.$store.dispatch('getNickname', res.data.nickname)
         }) 
+        .catch(err => {
+          console.log(err)
+        })
     },
   },
   created: function () {
@@ -74,9 +77,9 @@ export default {
     // 토큰이 있다면 this.login을 true로 변경
     if (token) {
       this.login = true
+      this.getUserInfo()
+      this.getUserNickname()
     }
-    this.getUserInfo()
-    this.getUserNickname()
   },
   watch: {
     $route (to, from){

@@ -4,7 +4,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">
-            {{ selectedMovie.MovieDetails.title }} ({{ selectedMovie.MovieDetails.original_title }})
+            {{ selectedMovie.title }} ({{ selectedMovie.original_title }})
             <button class="cart-button" @click="toggleCart">
               <img src="@/assets/cart_add_2.svg" v-if="!cart_added" alt="cart_add" class="cart-button-icon">
               <img src="@/assets/cart_remove.png" v-if="cart_added" alt="cart_add" class="cart-button-icon">
@@ -14,8 +14,8 @@
         </div>
         <div class="modal-sub-header">
           <div>
-            {{ selectedMovie.MovieDetails.release_date | getYear }}년 <span class="split-bar">|</span>
-            <span v-if="selectedMovie.runtime">{{ selectedMovie.MovieDetails.runtime | convertToTime }}</span> <span class="split-bar">|</span>
+            {{ selectedMovie.release_date | getYear }}년 <span class="split-bar">|</span>
+            <span v-if="selectedMovie.runtime">{{ selectedMovie.runtime | convertToTime }}</span> <span class="split-bar">|</span>
             <span>
               <img src="@/assets/star_empty.svg" class="detail-star-icon">
               <img src="@/assets/star_empty.svg" class="detail-star-icon">
@@ -41,10 +41,10 @@
             allowfullscreen></iframe>
           </div>
           <div class="movie-info">
-            <img :src="poster_path" :alt="selectedMovie.MovieDetails.title" class="poster">
-            <div v-if="selectedMovie.MovieDetails.overview" class="movie-info-overview">
+            <img :src="poster_path" :alt="selectedMovie.title" class="poster">
+            <div v-if="selectedMovie.overview" class="movie-info-overview">
               <h6>줄거리</h6>
-              <p>{{ selectedMovie.MovieDetails.overview }}</p>
+              <p>{{ selectedMovie.overview }}</p>
             </div>
           </div>
         </div>
@@ -71,7 +71,7 @@ export default {
     },
     methods: {
       moveToDetail: function () {
-        this.$router.push({ name: 'MovieDetail',  params: { movie_id: this.selectedMovie.MovieDetails.id }})
+        this.$router.push({ name: 'MovieDetail',  params: { movie_id: this.selectedMovie.id }})
       },
       toggleCart: function () {
         // console.log(this.loginUser)
@@ -105,13 +105,13 @@ export default {
         'loginUser'
       ]),
       trailer_src: function () {
-        return this.selectedMovie.MovieDetails.trailer_key ? `https://www.youtube.com/embed/${this.selectedMovie.MovieDetails.trailer_key}`: ''
+        return this.selectedMovie.trailer_key ? `https://www.youtube.com/embed/${this.selectedMovie.trailer_key}`: ''
       },
       poster_path: function () {
-        return this.selectedMovie.MovieDetails.poster_path ? `https://image.tmdb.org/t/p/original/${this.selectedMovie.MovieDetails.poster_path}`: ''
+        return this.selectedMovie.poster_path ? `https://image.tmdb.org/t/p/original/${this.selectedMovie.poster_path}`: ''
       },
       splited_genres: function () {
-        return this.selectedMovie.MovieDetails.genres ? this.selectedMovie.MovieDetails.genres.split(', ') : []
+        return this.selectedMovie.genres ? this.selectedMovie.genres.split(', ') : []
       },
     },
 }

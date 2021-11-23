@@ -1,6 +1,6 @@
 <template>
   <li class="movieItem" data-bs-toggle="modal" data-bs-target="#staticBackdrop" @click="onClickMovieItem">
-    <img :src="poster_path" alt="thumb" class="poster">
+    <img v-if="poster_path" :src="poster_path" alt="thumb" class="poster">
   </li>
 </template>
 

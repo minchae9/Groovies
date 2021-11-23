@@ -169,14 +169,11 @@ def recommendation(request):
 # 찜하기
 @api_view(['POST'])
 def add_cart(request, movie_pk):
-    if request.user.is_authenticated:
-        movie = get_object_or_404(Movie, pk=movie_pk)
-        if Cart.objects.filter(movie=movie, user=request.user).exists():
-            Cart.objects.filter(movie=movie, user=request.user).delete()
-            return Response({'message': '찜한 목록에서 삭제되었습니다.'})
-        else:
-            cart = Cart(movie=movie, user=request.user)
-            cart.save()
-            return Response({'message': '찜한 목록에 추가되었습니다.'})
-    return Response({'error': '로그인 후 이용 가능한 기능입니다.'})
-    
+    movie = Movie.objects.get(pk=movie_pk)
+    if Cart.objects.filter(movie=movie, user=request.user).exists():
+        Cart.objects.filter(movie=movie, user=request.user).delete()
+        return Response({'message': '찜한 목록에서 삭제되었습니다.'})
+    else:
+        cart = Cart(movie=movie, user=request.user)
+        cart.save()
+        return Response({'message': '찜한 목록에 추가되었습니다.'})

@@ -53,7 +53,7 @@ export default {
           // console.log(res.data)      
         })
         .catch (err => {
-          console.log(err.response)
+          console.log(err)
         })
     },
     filters: {
