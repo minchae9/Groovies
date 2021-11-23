@@ -105,7 +105,6 @@ def movie_similar(request, movie_pk):
 # 별점    
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
 def rating(request, movie_pk):
-    
     if request.method == 'POST':
         movie = get_object_or_404(Movie, pk=movie_pk)
         serializer = RatingSerializer(data=request.data)
@@ -135,7 +134,6 @@ def rating(request, movie_pk):
 # 검색
 @api_view(['GET'])
 def search(request, keyword):
-    # keyword = request.GET.get('searchKeyword')
     if keyword:
         search_list1 = Movie.objects.filter(title__contains=keyword)
         search_list2 = Movie.objects.filter(original_title__contains=keyword)
@@ -143,7 +141,6 @@ def search(request, keyword):
         search_list = search_list1 | search_list2 | search_list3
         serializer = MovieListSerializer(search_list, many=True)
         return Response(serializer.data)
-    return Response({'error': 'No keyword.'})
 
 
 # 추천
@@ -151,7 +148,7 @@ def search(request, keyword):
 def recommendation(request):
     movie_list = Rating.objects.filter(user=request.user.pk, rate__gte=4)
     result = Similar.objects.none()  # 빈 쿼리셋
-    if movie_list and request.user.is_authenticated:
+    if movie_list:
         for movie in movie_list:
             # movies_similar 테이블에서 original_movie로 필터링 후
             similar_movies = Similar.objects.filter(original_movie=movie.movie_id)

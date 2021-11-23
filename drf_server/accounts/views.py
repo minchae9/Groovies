@@ -82,54 +82,48 @@ def delete(request):
 
 @api_view(['GET'])
 def show_cart(request):
-    if request.user.is_authenticated:
-        cart_list = Cart.objects.filter(user=request.user)
-        if cart_list:
-            movies = Movie.objects.none()
-            for item in cart_list:
-                movie = Movie.objects.filter(pk=item.movie.id)
-                movies = movies | movie
-            serializers = MovieListSerializer(movies, many=True)
-            return Response(serializers.data)
-        return Response({'message': '찜하기로 첫 영화를 추가하세요!'})
-    return Response({'error': '로그인이 필요한 기능입니다.'})
+    cart_list = Cart.objects.filter(user=request.user)
+    if cart_list:
+        movies = Movie.objects.none()
+        for item in cart_list:
+            movie = Movie.objects.filter(pk=item.movie.id)
+            movies = movies | movie
+        serializers = MovieListSerializer(movies, many=True)
+        return Response(serializers.data)
+    return Response({'message': '찜하기로 첫 영화를 추가하세요!'}, status=status.HTTP_204_NO_CONTENT)
+
 
 
 @api_view(['GET'])
 def rated_movies(request):
-    if request.user.is_authenticated:
-        rated_list = Rating.objects.filter(user=request.user)
-        if rated_list:
-            movies = Movie.objects.none()
-            for item in rated_list:
-                movie = Movie.objects.filter(pk=item.movie.id)
-                movies = movies | movie
-            serializers = MovieListSerializer(movies, many=True)
-            return Response(serializers.data)
-        return Response({'message': '영화에 첫 평점을 남겨주세요!'})
-    return Response({'error': '로그인이 필요한 기능입니다.'})
+    rated_list = Rating.objects.filter(user=request.user)
+    if rated_list:
+        movies = Movie.objects.none()
+        for item in rated_list:
+            movie = Movie.objects.filter(pk=item.movie.id)
+            movies = movies | movie
+        serializers = MovieListSerializer(movies, many=True)
+        return Response(serializers.data)
+    return Response({'message': '영화에 첫 평점을 남겨주세요!'}, status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET'])
 def my_comments(request):
-    if request.user.is_authenticated:
-        comment_list = Comment.objects.filter(user=request.user)
-        if comment_list:
-            serializers = CommentSerializer(comment_list, many=True)
-            return Response(serializers.data)
-        return Response({'message': '영화에 첫 한마디를 남겨주세요!'})
-    return Response({'error': '로그인이 필요한 기능입니다.'})
+    comment_list = Comment.objects.filter(user=request.user)
+    if comment_list:
+        serializers = CommentSerializer(comment_list, many=True)
+        return Response(serializers.data)
+    return Response({'message': '영화에 첫 한마디를 남겨주세요!'}, status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(['GET'])
 def my_articles(request):
-    if request.user.is_authenticated:
-        article_list = Article.objects.filter(user=request.user)
-        if article_list:
-            serializers = ArticleListSerializer(article_list, many=True)
-            return Response(serializers.data)
-        return Response({'message': '커뮤니티에 첫 게시글을 남겨주세요!'})
-    return Response({'error': '로그인이 필요한 기능입니다.'})
+    article_list = Article.objects.filter(user=request.user)
+    if article_list:
+        serializers = ArticleListSerializer(article_list, many=True)
+        return Response(serializers.data)
+    return Response({'message': '커뮤니티에 첫 게시글을 남겨주세요!'})
+
 
 
 # 전체 유저정보 조회
