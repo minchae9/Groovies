@@ -8,7 +8,10 @@ export default new Vuex.Store({
   state: {
     searchKeyword: '',
     selectedMovie: {},
-    loginUser: null,  // username과 user_id
+    loginUser: {
+      user_id: '',
+      username: ''
+    },  // username과 user_id
     loginUser_nickname: '',
     loginUser_profile_path: 0,
   },

@@ -26,7 +26,7 @@
         </div>
       </div>
 
-        <button v-if="userInfo" id="like-button" @click="toggleLike">
+        <button v-if="userInfo.user_id !== ''" id="like-button" @click="toggleLike">
           <i class="fa-heart" :class="[{ fas: likeState }, { far: !likeState }]"></i>
           <span>{{likeUsersCount}}</span>
         </button>
@@ -202,11 +202,11 @@ export default {
           console.log(err)
         })  
       // 좋아요 상태
-      this.getLikeState(article_id)
+      if (localStorage.getItem('jwt')) {
+        this.getLikeState(article_id)
+      }
+      
     },
-    // updated: function () {
-    //   this.getLikeState(this.article.id)
-    // },
     filters: {
       convertFormat: function (string) {
         return string? `${string.slice(0,4)}년 ${string.slice(5,7)}월 ${string.slice(8,10)}일 ${string.slice(11,16)}` : ''
