@@ -75,8 +75,9 @@ def update(request, profile_pk):
 
 
 @api_view(['DELETE'])
-def delete(request):
-    request.user.delete()
+def delete(request, profile_pk):
+    user = get_user_model().objects.get(pk=profile_pk)
+    user.delete()
     return Response({'message': '회원 탈퇴가 완료되었습니다. 안녕히 가십시오.'}, status=status.HTTP_202_ACCEPTED)
 
 

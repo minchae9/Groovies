@@ -24,8 +24,9 @@
             {{ selectedMovie.release_date | getYear }}년 <span class="split-bar">|</span>
             <span v-if="selectedMovie.runtime">{{ selectedMovie.runtime | convertToTime }}</span> <span class="split-bar">|</span>
             
-            <!-- rating -->
-            <span class="rating" @click="rate" :data-bs-dismiss="ratingModal" :aria-label="ratingClose">
+            <!-- average rate -->
+            <span>평점 {{ selectedMovie.vote_average }}</span>
+            <!-- <span class="rating" @click="rate" :data-bs-dismiss="ratingModal" :aria-label="ratingClose">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.07 20.23"
               v-for="(star_src, idx) in new Array(5)" :key="idx"
               class="detail-star-icon" :data-score="Number(idx)+1">
@@ -38,7 +39,7 @@
                   :class="{ 'fullStar': idx < ratingScore }" 
                   d="M11.81,1.29l2,4.05a1.44,1.44,0,0,0,1.07.78l4.47.65a1.42,1.42,0,0,1,.79,2.43l-3.23,3.15a1.41,1.41,0,0,0-.41,1.26l.76,4.45a1.42,1.42,0,0,1-2.06,1.5l-4-2.1a1.42,1.42,0,0,0-1.33,0l-4,2.1a1.42,1.42,0,0,1-2.07-1.5l.77-4.45a1.47,1.47,0,0,0-.41-1.26L.93,9.2a1.43,1.43,0,0,1,.79-2.43l4.47-.65a1.44,1.44,0,0,0,1.07-.78l2-4A1.43,1.43,0,0,1,11.81,1.29Z"/></g></g>
               </svg>
-            </span>
+            </span> -->
           </div>
 
           <div>
@@ -75,6 +76,7 @@
               <p>{{ selectedMovie.overview }}</p>
             </div>
           </div>
+          <button id="close-button-bottom" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
 
         <!-- footer -->
@@ -116,9 +118,9 @@ export default {
           Authorization: `JWT ${token}`
         }
         return config
-    },
+      },
       toggleCart: function () {
-        if (this.loginUser.user_id) {
+        if (this.loginUser && this.loginUser.user_id) {
           // 로그인한 사용자면
           axios({
             method: 'post',
@@ -319,7 +321,6 @@ export default {
 </script>
 
 <style>
-
   .modal-header, 
   .modal-body, 
   .modal-content,
@@ -335,29 +336,36 @@ export default {
   .modal-header,
   .modal-sub-header, 
   .modal-body, 
-  .modal-footer {
-    padding: 1.25rem;
+  .modal-footer,
+  .detail-header,
+  .detail-sub-header, 
+  .detail-body {
+    padding: 32px;
   }
 
-  .modal-header {
+  .modal-header,
+  .detail-header {
     padding-bottom: 0;
     text-align: left;
     align-items: start;
   }
 
-  .modal-body {
+  .modal-body,
+  .detail-body {
     padding-top: 0.5rem;
     padding-bottom: 0;
   }
 
-  .modal-sub-header {
+  .modal-sub-header,
+  .detail-sub-header {
     text-align: left;
     font-size: 0.875rem;
     padding-top: 0;
     padding-bottom: 0;
   }
 
-  .modal-sub-header > div:first-child {
+  .modal-sub-header > div:first-child,
+  .detail-sub-header > div:first-child {
     padding-bottom: 0.5rem;
   }
 
@@ -391,9 +399,11 @@ export default {
     color: rgba(165, 165, 165, 0.5);
   }
 
-  .modal-title {
+  .modal-title,
+  .detail-title {
     font-family: scd6;
     font-size: 1.5rem;
+    word-break: keep-all;
   }
 
   .modal-dialog {
@@ -465,8 +475,9 @@ export default {
   }
 
   .movie-info-overview {
-    text-align: left;
-    padding-right: 5%;
+    text-align: justify;
+    padding-right: 10%;
+    word-break: break-all;
   }
 
   .movie-info-overview > h6 {
@@ -483,12 +494,29 @@ export default {
     margin-right: 1rem;
   }
 
+  .modal-body .staffs {
+    width: 210px;
+  }
+
   .poster {
     height: 300px;
     width: 210px;
     object-fit: cover;
   }
 
+  .item > div {
+    width: 138px;
+    word-break: keep-all;
+    text-align: left;
+  }
+
+  #close-button-bottom {
+    position: absolute;
+    bottom: -2rem;
+    right: 0.5rem;
+    padding: 2rem;
+    padding-bottom: 0;
+  }
 
   /* star */
   .cls-1{fill:none;stroke:#fbb03b;stroke-linecap:round;stroke-miterlimit:10;}

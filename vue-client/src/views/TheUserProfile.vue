@@ -69,6 +69,9 @@
         </ul>
       </div>
     </div>
+    <div>
+      <a @click="deleteAccount" href="#" style="color: gray;">회원탈퇴</a>
+    </div>
   </div>
 </template>
 
@@ -90,6 +93,16 @@ export default {
       }
     },
     methods: {
+      deleteAccount: function () {
+        axios.delete(`http://127.0.0.1:8000/accounts/profile/${this.user_id}/delete/`)
+          .then(() => {
+            // console.log(res)
+            this.$router.push({ name: 'Home' })
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      },
       updateProfile: function () {
         this.$router.push({ name: 'Signup' })
         this.$router.go()

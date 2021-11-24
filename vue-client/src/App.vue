@@ -97,7 +97,8 @@ export default {
       return this.$store.state.loginUser
     },
     loginUserNickname: function () {
-      return this.$store.state.loginUser_nickname
+      const nickname = this.$store.state.loginUser_nickname
+      return nickname ? nickname : this.$store.state.loginUser.username
     }
   },
 }
@@ -122,6 +123,13 @@ export default {
 @font-face {
      font-family: 'scd3';
      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+     font-weight: normal;
+     font-style: normal;
+}
+
+@font-face {
+     font-family: 'scd5';
+     src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-5Medium.woff') format('woff');
      font-weight: normal;
      font-style: normal;
 }
@@ -200,12 +208,10 @@ body {
   top: 0;
   width: 100%;
   min-width: 768px;
-  padding-bottom: 30px;
-  padding: 30px;
+  padding: 32px;
   z-index: 100;
   color: white;
   text-decoration: none;
-
 }
 
 #nav > div {

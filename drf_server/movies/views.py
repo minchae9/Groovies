@@ -103,7 +103,7 @@ def movie_similar(request, movie_pk):
 
 
 # 별점    
-@api_view(['GET', 'POST', 'PUT', 'DELETE'])
+@api_view(['GET', 'POST', 'PUT'])
 def rating(request, movie_pk):
     if Rating.objects.filter(movie=movie_pk, user=request.user).exists():
         rating = Rating.objects.get(movie=movie_pk, user=request.user)
@@ -115,15 +115,7 @@ def rating(request, movie_pk):
             serializer = RatingSerializer(instance=rating, data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
-                return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-
-        elif request.method == 'DELETE':
-            rating.delete()
-            data = {
-                'delete': f'영화 {movie_pk}에 대한 평점이 삭제되었습니다.'
-            }
-            return Response(data, status=status.HTTP_204_NO_CONTENT)
-    
+                return Response(serializer.data, status=status.HTTP_202_ACCEPTED) 
     else:
         if request.method == 'POST':
             movie = get_object_or_404(Movie, pk=movie_pk)

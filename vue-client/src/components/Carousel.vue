@@ -122,6 +122,8 @@ export default {
   .carousel h5 {
     font-family: scd8;
     font-size: 4rem;
+    width: 70%;
+    word-break: keep-all;
   }
 
   .carousel-caption {
