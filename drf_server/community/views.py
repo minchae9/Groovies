@@ -49,20 +49,24 @@ def article_detail(request, article_pk):
 
 
 # 게시글 좋아요
-@api_view(['POST'])
-def article_like(request, article_pk):
+@api_view(['GET', 'POST'])
+def article_like(request, article_pk, user_pk):
     article = Article.objects.get(pk=article_pk)
-    if article.like_article_users.filter(pk=request.user.pk).exists():
-        article.like_article_users.remove(request.user)
-        liked = False
-    else:
-        article.like_article_users.add(request.user)
-        liked = True
-    like_status = {
-        'liked': liked, # 좋아요 여부
-        'count': article.like_article_users.count(),
-    }
-    return Response(like_status)
+    if request.method == 'GET':
+        if article.like_article_users.filter(pk=user_pk).exists():
+            liked = True
+        else:
+            liked = False
+        like_status = {
+            'liked': liked, # 좋아요 여부
+        }
+        return Response(like_status)
+    elif request.method == 'POST':
+        if article.like_article_users.filter(pk=request.user.pk).exists():
+            article.like_article_users.remove(request.user)
+        else:
+            article.like_article_users.add(request.user)
+        return Response(status=status.HTTP_200_OK)
     
 
 # 전체 댓글      

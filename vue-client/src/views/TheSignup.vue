@@ -43,8 +43,9 @@
       </div>
       <p class="notice" :class="{ shown: isNotSamePW }">비밀번호가 일치하지 않습니다!</p>
       <div v-if="!this.$store.state.loginUser">
+        <label for="agree" style="cursor: pointer;">회원가입에 동의합니다.</label>
         <input type="checkbox" id="agree">
-        <label for="agree" style="cursor: pointer;">회원가입에 동의합니다!</label>
+        
       </div>
       <button v-if="this.$store.state.loginUser !== null" @click="update">회원정보 수정</button>
       <button v-else @click="signup">회원가입</button>
@@ -220,21 +221,23 @@ export default {
         const result = JSON.parse(payload.toString()) 
         this.user_id = result.user_id
         this.username = result.username
+
+        // 유저 정보 (2)
+        axios({
+          method: 'get',
+          url: `http://127.0.0.1:8000/accounts/profile/${this.user_id}/`
+        })
+          .then(res => {
+            // this.username = res.data.username
+            this.nickname = res.data.nickname
+            this.profile_path = res.data.profile_path
+            this.credentials.profile_path = res.data.profile_path // 기존 사용자 정보 등록
+          })
+          .catch(err => {
+            console.log(err)
+          })
       }
-      // 유저 정보 (2)
-      axios({
-        method: 'get',
-        url: `http://127.0.0.1:8000/accounts/profile/${this.user_id}/`
-      })
-        .then(res => {
-          // this.username = res.data.username
-          this.nickname = res.data.nickname
-          this.profile_path = res.data.profile_path
-          this.credentials.profile_path = res.data.profile_path // 기존 사용자 정보 등록
-        })
-        .catch(err => {
-          console.log(err)
-        })
+      
 
 
       this.getAllUsername()

@@ -2,23 +2,28 @@
   <div class="modal fade" data-backdrop="static" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
+
         <!-- header -->
         <div class="modal-header">
           <h5 class="modal-title" id="exampleModalLabel">
             {{ selectedMovie.title }} ({{ selectedMovie.original_title }})
+    
             <!-- cart button -->
             <button @click="toggleCart" class="cart-button" :data-bs-dismiss="ratingModal" :aria-label="ratingClose">
               <img src="@/assets/cart_add_2.svg" v-if="!isAddedToCart" alt="cart_add" class="cart-button-icon">
               <img src="@/assets/cart_remove.png" v-if="isAddedToCart" alt="cart_add" class="cart-button-icon">
             </button>
+
           </h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
+
         <!-- sub-header -->
         <div class="modal-sub-header">
           <div>
             {{ selectedMovie.release_date | getYear }}년 <span class="split-bar">|</span>
             <span v-if="selectedMovie.runtime">{{ selectedMovie.runtime | convertToTime }}</span> <span class="split-bar">|</span>
+            
             <!-- rating -->
             <span class="rating" @click="rate" :data-bs-dismiss="ratingModal" :aria-label="ratingClose">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.07 20.23"
@@ -35,6 +40,7 @@
               </svg>
             </span>
           </div>
+
           <div>
             <span class="genre-button" v-for="(genre, index) in splited_genres" :key="index" 
             @click="moveToSearch(genre)" data-bs-dismiss="modal" aria-label="Close">
@@ -44,7 +50,7 @@
         </div>
 
         <hr style="margin: 1rem; color: rgba(165, 165, 165, 0.5);">
-
+        
         <!-- body -->
         <div class="modal-body">
           <div id="movie-trailer-box" v-if="trailer_src">
@@ -52,7 +58,7 @@
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
             allowfullscreen></iframe>
           </div>
-          <div class="movie-info">
+          <div class="movie-info"> 
             <div class="movie-info-left">
               <img :src="poster_path" :alt="selectedMovie.title" class="poster">
               <div class="staffs">
@@ -110,11 +116,8 @@ export default {
           Authorization: `JWT ${token}`
         }
         return config
-      },
-
+    },
       toggleCart: function () {
-        // console.log(this.loginUser)
-        // console.log('movie', this.selectedMovie)
         if (this.loginUser.user_id) {
           // 로그인한 사용자면
           axios({
@@ -133,17 +136,34 @@ export default {
         }
       },
       rate: function (event) {
-        if (this.loginUser.user_id) {
+        if (this.loginUser && this.loginUser.user_id) {
           // 로그인된 상태면
-          const score = event.target.dataset.score
+          const targetScore = event.target.dataset.score
 
-          if (this.ratingScore > 0) {
-            // 이미 줬던 점수가 있으면 -> 수정 (put)
+          if (targetScore) {
+            // 별 눌렀을 때 (빈공간x)
+            if (this.ratingScore > 0) {
+              // 이미 줬던 점수가 있으면 -> 수정 (put)
+                axios({
+                  method: 'put',
+                  url: `http://127.0.0.1:8000/movies/${this.selectedMovie.id}/rating/`,
+                  headers: this.setToken(),
+                  data: { rate : targetScore },
+                })
+                .then(() => {
+                  this.updateRatingState()
+                })
+                .catch(err => {
+                  console.log(err)
+                })
+  
+            } else {
+              // 준 점수가 없으면 -> 새로 등록 (post)
               axios({
-                method: 'put',
+                method: 'post',
                 url: `http://127.0.0.1:8000/movies/${this.selectedMovie.id}/rating/`,
                 headers: this.setToken(),
-                data: { rate : score },
+                data: { rate : targetScore },
               })
               .then(() => {
                 this.updateRatingState()
@@ -151,22 +171,9 @@ export default {
               .catch(err => {
                 console.log(err)
               })
-
-          } else {
-            // 준 점수가 없으면 -> 새로 등록 (post)
-            axios({
-              method: 'post',
-              url: `http://127.0.0.1:8000/movies/${this.selectedMovie.id}/rating/`,
-              headers: this.setToken(),
-              data: { rate : score },
-            })
-            .then(() => {
-              this.updateRatingState()
-            })
-            .catch(err => {
-              console.log(err)
-            })
+            }
           }
+
         } else {
           // 로그인을 안했으면
           this.$router.push({ name: 'Login' })
@@ -219,8 +226,8 @@ export default {
           }
         })
       },
-      updateLoginState: function (user) {
-        if (user.user_id) {
+      updateLoginState: function () {
+        if (this.loginUser && this.loginUser.user_id) {
           //ratings 버튼
           this.ratingModal = ''
           this.ratingClose = ''
@@ -232,8 +239,12 @@ export default {
       },
       updateStates: function () {
         this.updateLoginState(this.loginUser)
-        this.updateCartState()
-        this.updateRatingState()
+
+        // 로그인한 경우만 로그인 정보 업데이트
+        if (this.loginUser && this.loginUser.user_id) {
+          this.updateCartState()
+          this.updateRatingState()
+        }
       },
       getDirectors: function () {
         axios({
@@ -241,8 +252,6 @@ export default {
           url: `http://127.0.0.1:8000/movies/${this.selectedMovie.id}/director/`,
         })
         .then((res) => {
-          console.log('director axios res!!', res)
-          // this.ratingScore =  res.data.rate) ? res.data.rate : 0
           this.directors = res.data
         })
         .catch(err => {
@@ -255,13 +264,12 @@ export default {
           url: `http://127.0.0.1:8000/movies/${this.selectedMovie.id}/actor/`,
         })
         .then((res) => {
-          // console.log('actor axios res!!', res)
           this.actors = res.data
         })
         .catch(err => {
           console.log(err)
         })
-      },
+      }
     },
     filters: {
       convertToTime: function (num) {
@@ -274,7 +282,7 @@ export default {
       },
       getNames: function (arr) {
         return arr.map(person => person.name).join(', ')
-      },
+      }
     },
     computed: {
       ...mapState([
@@ -297,6 +305,7 @@ export default {
       },
       selectedMovie: function () {
         this.updateStates()
+
         this.getDirectors()
         this.getActors()
       },
@@ -305,11 +314,12 @@ export default {
       if (this.selectedMovie.id) {
         this.updateStates()
       }
-    },
+    }
 }
 </script>
 
 <style>
+
   .modal-header, 
   .modal-body, 
   .modal-content,
@@ -445,7 +455,7 @@ export default {
     margin-bottom: 1rem;
   }
 
-   .movie-info-left {
+  .movie-info-left {
     text-align: left;
     font-size: 0.875rem;
   }
@@ -479,11 +489,11 @@ export default {
     object-fit: cover;
   }
 
-   /* star */
+
+  /* star */
   .cls-1{fill:none;stroke:#fbb03b;stroke-linecap:round;stroke-miterlimit:10;}
   .fullStar {
-    fill: #fbb03b;
-  }
-
+          fill: #fbb03b;
+      }
 
 </style>

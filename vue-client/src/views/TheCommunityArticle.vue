@@ -7,7 +7,7 @@
           <div>
             <img v-if="article.profile_path >= 0" :src="require(`@/assets/profile_img_${article.profile_path}.jpg`)" 
             class="profile-img" alt="profile_img">
-            {{ article.nickname }}
+            <span class="article-list-item-user" @click="moveToUserProfile(article.user)">{{ article.nickname }}</span>
           </div>
           <div>
             <p>작성  |  {{ article.created_at | convertFormat }}</p>
@@ -17,39 +17,40 @@
           </div>
         </div>
         <div id="article-content-box">
+          <div v-if="article.movie_title">
+            <p>영화: <b>《 {{ article.movie_title }} 》</b></p>
+          </div>
           <p id="article-content">
             {{ article.content }}
           </p>
-          <div v-if="article.movie_title">
-            <p>{{ article.movie_title }}</p>
-          </div>
         </div>
       </div>
 
-        <button id="like-button" @click="toggleLike">
-          <i class="fa-heart" :class="[{ fas: isLikeUser }, { far: !isLikeUser }]"></i>
+        <button v-if="userInfo" id="like-button" @click="toggleLike">
+          <i class="fa-heart" :class="[{ fas: likeState }, { far: !likeState }]"></i>
+          <span>{{likeUsersCount}}</span>
+        </button>
+        <button v-else id="like-button" @click="toggleLike" disabled>
+          <i class="fa-heart" :class="[{ fas: likeState }, { far: !likeState }]"></i>
           <span>{{likeUsersCount}}</span>
         </button>
 
       <div id="article-comments-box">
-        <div id="article-comment-title">댓글</div>
-        <ul id="article-comments" v-if="comments">
-          <li class="article-comment" v-for="(comment, index) in comments" :key="index">
-            <div>
-              <img :src="require(`@/assets/profile_img_${comment.profile_path}.jpg`)" 
-            class="profile-img comment-profile-img" alt="profile_img">
-            </div>
-            <div class="comment-username">{{ comment.username }}</div>
-            <div class="comment-content">{{ comment.content }}</div>
-            <div class="comment-created-at">{{ comment.created_at | convertFormat }}</div>
-            <button @click="deleteComment(comment)" v-if="(userInfo && comment.user === userInfo.user_id)">삭제</button>
-          </li>
-        </ul>
-        <div v-else>
-          첫 댓글을 남겨보세요!
+        <div id="article-comment-title">댓글 ({{comments.length}})</div>
+          <ul id="article-comments">
+            <li class="article-comment" v-for="(comment, index) in comments" :key="index">
+              <div>
+                <img :src="require(`@/assets/profile_img_${comment.profile_path}.jpg`)" 
+              class="profile-img comment-profile-img" alt="profile_img">
+              </div>
+              <div class="comment-username">{{ comment.username }}</div>
+              <div class="comment-content">{{ comment.content }}</div>
+              <div class="comment-created-at">{{ comment.created_at | convertFormat }}</div>
+              <button @click="deleteComment(comment)" v-if="(userInfo && comment.user === userInfo.user_id)">삭제</button>
+            </li>
+          </ul>
         </div>
-        <br>
-      </div>
+
 
       <div id="comment-input-box">
         <textarea v-if="login" id="comment-input" placeholder="댓글을 입력해주세요 :)"
@@ -75,13 +76,16 @@ export default {
         article: {},  // 게시글 정보 + 유저 id (as 'user), username, nickname, profile_path
         comments: [],
         commentInput: '',
-        isLikeUser: false,
+        likeState: false,
         likeUsersCount: 0,
       }
     },
     methods: {
       onCommentInput: function (event) {
         this.commentInput = event.target.value
+      },
+      moveToUserProfile: function (user_id) {
+        this.$router.push({ name: 'UserProfile', params: { user_id: user_id }})
       },
       createComment: function () {
         if (this.commentInput) {
@@ -108,7 +112,7 @@ export default {
         // 좋아요 정보 저장하기
         axios({
           method: 'post',
-          url: `http://127.0.0.1:8000/community/${this.article.id}/like/`,
+          url: `http://127.0.0.1:8000/community/${this.article.id}/like/${this.$store.state.loginUser.user_id}/`,
           headers: { Authorization : `JWT ${localStorage.getItem('jwt')}`}
         })
           .then(() => {})
@@ -117,13 +121,13 @@ export default {
           })
         // 하트와 좋아요 수 변경
         if (localStorage.getItem('jwt')) {
-          if (this.isLikeUser) {
-          this.isLikeUser = false
+          if (this.likeState) {
+          this.likeState = false
           if (this.likeUsersCount > 0) {
             this.likeUsersCount--
             }
           } else {
-            this.isLikeUser = true
+            this.likeState = true
             this.likeUsersCount++
           }
         }
@@ -152,6 +156,17 @@ export default {
         })
           .then(() => {
             this.$router.push({ name: 'Community' })
+          })
+          .catch(err => {
+            console.log(err)
+          })
+      },
+      getLikeState: function (article_id) {
+        axios.get(`http://127.0.0.1:8000/community/${article_id}/like/${this.$store.state.loginUser.user_id}/`)
+          .then(res => {
+            // console.log(res)
+            this.likeState = res.data.liked
+            this.likeUsersCount = res.data.count
           })
           .catch(err => {
             console.log(err)
@@ -186,7 +201,12 @@ export default {
         .catch(err => {
           console.log(err)
         })  
+      // 좋아요 상태
+      this.getLikeState(article_id)
     },
+    // updated: function () {
+    //   this.getLikeState(this.article.id)
+    // },
     filters: {
       convertFormat: function (string) {
         return string? `${string.slice(0,4)}년 ${string.slice(5,7)}월 ${string.slice(8,10)}일 ${string.slice(11,16)}` : ''
@@ -198,7 +218,7 @@ export default {
       },
       userInfo: function () {
         return this.$store.state.loginUser
-      }
+      },
     }
 }
 </script>
