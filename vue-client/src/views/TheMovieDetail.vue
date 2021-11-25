@@ -23,7 +23,7 @@
         <span>평점 <span style="font-family:scd5;">{{ selectedMovie.vote_average > 0 ? selectedMovie.vote_average : '정보 없음'}}</span></span> <span class="split-bar">|</span>
         
         <!-- rating -->
-        <span class="rating" @click="rate">
+        <span :class="{ rating : login }" @click="rate">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.07 20.23"
           v-for="(star_src, idx) in new Array(5)" :key="idx"
           class="detail-star-icon" :data-score="Number(idx)+1">
@@ -416,6 +416,10 @@ export default {
     max-width: 768px;
     margin: 0 auto;
     margin-bottom: 4rem;
+  }
+
+  .rating {
+    cursor: pointer;
   }
 
   @media screen and (max-width: 1200px) {

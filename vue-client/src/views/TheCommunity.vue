@@ -4,8 +4,10 @@
       <h1>커뮤니티</h1>
       <div class="line"></div>
     </div>
+
     <button v-if="login == true" @click="createArticle" class="btn btn-primary article-create-button">게시글 작성</button>  
-    <ul id="article-list" v-if="articleList && (articleList.length > 0)">
+
+    <ul id="article-list" v-if="articleList && (articleList.length > 0) && login == true">
       <li class="article-list-item" v-for="(articleListItem, index) in articleList" :key="index">
         <span class="article-list-item-title" 
         @click="moveToArticle(articleListItem.id)">
@@ -45,6 +47,9 @@ export default {
       }
     },
     methods: {
+      moveToLogin: function () {
+        this.$router.push({ name: 'Login'})
+      },
       moveToArticle: function (article_id) {
         this.$router.push({ name: 'CommunityArticle', params: { article_id: article_id }})
       },

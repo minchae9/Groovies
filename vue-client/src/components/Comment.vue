@@ -5,7 +5,7 @@
         <div id="article-comment-title">댓글 ({{comments.length}})</div>
           <ul id="article-comments">
             <li class="article-comment" v-for="(comment, index) in comments" :key="index">
-              <div>
+              <div class="comment-img-box">
                 <img :src="require(`@/assets/profile_img_${comment.profile_path}.jpg`)" 
                 class="profile-img comment-profile-img" alt="profile_img">
               </div>
@@ -13,9 +13,14 @@
                 {{ comment.nickname }} 
               </div>
               <div class="comment-content">{{ comment.content }}</div>
-              <div class="comment-created-at">{{ comment.created_at | convertFormat }}</div>
-              <button @click="deleteComment(comment)" 
-              v-if="((login == true) && (comment.user == loginUser.id))" class="btn btn-secondary article-button">삭제</button>
+              <div class="comment-time">
+                <div>작성 | {{ comment.created_at | convertFormat }}</div>
+                <div>수정 | {{ comment.updated_at | convertFormat }}</div>
+              </div>
+              <div id="comment-button-box">
+                <button @click="deleteComment(comment)"
+                v-if="((login == true) && (comment.user == loginUser.id))" class="btn btn-secondary article-button">삭제</button>
+              </div>
             </li>
           </ul>
       </div>
@@ -107,6 +112,11 @@ export default {
 
 <style>
 
+  .comment-img-box {
+    display: flex;
+    align-items: center;
+  }
+
 
   #article-comments-box {
     margin-top: 3rem;
@@ -136,6 +146,7 @@ export default {
   .comment-username {
     font-family: scd6;
     margin-right: 1rem;
+    word-break: keep-all;
   }
 
   .comment-content {
@@ -146,16 +157,23 @@ export default {
   }
 
   #article-header > div:last-child,
-  .comment-created-at {
+  .comment-time {
     font-size: 0.75rem;
     color: rgb(151, 151, 151);
   }
 
   .comment-username,
   .comment-content,
-  .comment-created-at {
+  .comment-time {
     display: flex;
     align-items: center;
+  }
+
+  .comment-time {
+    flex-direction: column;
+    margin-right: 1rem;
+    min-width: 11rem;
+    justify-content: center;
   }
 
   #comment-input-box {
@@ -168,6 +186,11 @@ export default {
     resize: none;
     padding: .5rem;
     border: none;
+  }
+
+  #comment-button-box {
+    display: flex;
+    align-items: center;
   }
 
   #comment-button {

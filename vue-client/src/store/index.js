@@ -96,9 +96,11 @@ export default new Vuex.Store({
     },
     logout: function ({ commit }) {
       commit('LOGOUT')
+      sessionStorage.removeItem('profilepath')
     },
     login: function ({ commit }) {
       commit('LOGIN')
+      
     },
     updateIsMySelf: function ({commit}, BOOL) {
       commit('UPDATE_IS_MYSELF', BOOL)

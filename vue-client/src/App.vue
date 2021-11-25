@@ -232,12 +232,17 @@ body {
 }
 
 #nav a.router-link-exact-active {
-  font-weight: bold;
+  font-family: scd5;
 }
 
 #content {
   margin-top: 100px;
   margin-bottom: 48px;
+}
+
+.input-style {
+  border-radius: 4px;
+  border: 1px solid black;
 }
 
 #footer {
