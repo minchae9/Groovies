@@ -75,6 +75,7 @@ export default {
       this.$store.dispatch('login')
       this.getUserBasics()
       this.getUserInfo()
+      sessionStorage.setItem('profilepath', this.loginUser.profile_path)
     }
   },
   computed: {
@@ -231,12 +232,17 @@ body {
 }
 
 #nav a.router-link-exact-active {
-  font-weight: bold;
+  font-family: scd5;
 }
 
 #content {
   margin-top: 100px;
   margin-bottom: 48px;
+}
+
+.input-style {
+  border-radius: 4px;
+  border: 1px solid black;
 }
 
 #footer {

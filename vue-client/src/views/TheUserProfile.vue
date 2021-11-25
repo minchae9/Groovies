@@ -113,6 +113,7 @@ export default {
           this.$store.dispatch('logout')
         })
         .then(() => {
+          sessionStorage.removeItem('profilepath')
           this.$router.push({ name: 'Home' })
         })
         .catch(err => {
@@ -121,7 +122,6 @@ export default {
     },
     updateProfile: function () {
       this.$router.push({ name: 'Signup' })
-      this.$router.go()
     },
     moviePoster: function (movie) {
       return `${POSTER_URL}/${movie.poster_path}`
@@ -225,7 +225,7 @@ export default {
 </script>
 
 <style>
-  #article-content-box {
+  #user-content-box {
     width: 70%;
     margin: 0 auto;
   }
@@ -256,5 +256,10 @@ export default {
     margin-bottom: 1rem;
   }
 
+  #account-delete-button {
+    color: gray; 
+    margin-top: 3rem; 
+    display: inline-block;
+  }
 
 </style>
