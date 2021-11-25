@@ -201,6 +201,7 @@ export default {
 
   #article-content {
     text-align: left;
+    padding: 0 1rem;
   }
 
   #article-header > div:last-child > p {

@@ -21,11 +21,11 @@
       <!-- list -->
     </ul>
 
-    <div v-else-if="login == true">    <!-- 로그인은 했는데 글이 없을 때 -->
+    <div v-else-if="login == true" class="community-notice">    <!-- 로그인은 했는데 글이 없을 때 -->
       <h6 v-if="login == true">어서 첫 게시글을 남겨주세요!</h6>
     </div>
 
-    <div v-else>   <!-- 로그인을 안했을 때 -->
+    <div v-else class="community-notice">   <!-- 로그인을 안했을 때 -->
       <h6>글을 보려면 로그인해주세요!</h6>
       <button class="btn btn-primary" @click="moveToLogin" style="margin-top: 2rem;">로그인하러 가기</button>
     </div>
@@ -86,6 +86,10 @@ export default {
 </script>
 
 <style>
+  .community-notice {
+    margin-top: 4rem;
+  }
+  
   #article-list {
     list-style: none;
     padding: 0;
