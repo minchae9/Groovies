@@ -55,8 +55,7 @@ const routes = [
     component: MovieDetail 
   },
   {
-    // path: '/accounts/:user_id',
-    path: '/accounts/',
+    path: '/accounts/:userid',
     name: 'UserProfile',
     component: UserProfile,
   },

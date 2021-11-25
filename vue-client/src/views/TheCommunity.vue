@@ -46,7 +46,7 @@ export default {
         this.$router.push({ name: 'CommunityArticle', params: { article_id: article_id }})
       },
       moveToUserProfile: function (user_id) {
-        this.$router.push({ name: 'UserProfile', params: { user_id: user_id }})
+        this.$router.push({ name: 'UserProfile', params: { userid: user_id }})
       },
       createArticle: function () {
         this.$router.push({ name: 'CommunityArticleCreate' })

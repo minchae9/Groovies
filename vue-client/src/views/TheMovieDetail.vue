@@ -201,7 +201,7 @@ export default {
         }
       },
       moveToSearch: function (genre) {
-        this.$router.push({name: 'Search', params: {keyword: genre}})
+        this.$router.push({name: 'Search', params: { keyword: genre }})
         this.$store.dispatch('onSearch', genre)
       },
       updateCartState: function () {

@@ -1,16 +1,16 @@
 <template>
   <div>
-      <div class="page-title" style="margin-bottom: 1.5rem;">
-        <h1>{{ (this.$route.query.userid == loginUser.id) ? '마이페이지' : '유저정보' }} </h1>
-        <div class="line"></div>
-      </div>
+    <div class="page-title" style="margin-bottom: 1.5rem;">
+      <h1>{{ (this.$route.params.userid == loginUser.id) ? '마이페이지' : '유저정보' }} </h1>
+      <div class="line"></div>
+    </div>
 
     <div id="basic-profile">
       <img v-if="(profile_path !== undefined) && (profile_path !== null) && (profile_path !== '')" :src="require(`@/assets/profile_img_${profile_path}.jpg`)" class="profile" alt="profile_img">
       <div id="article-body">
         <div>닉네임: <span style="font-family:scd5;">{{ nickname }}</span></div>
         <div>아이디: {{ username }}</div>
-        <button @click="updateProfile" class="btn btn-secondary" v-if="(this.$route.query.userid == loginUser.id)" style="margin-top: 1rem;">회원정보 수정</button>
+        <button @click="updateProfile" class="btn btn-secondary" v-if="(this.$route.params.userid == loginUser.id)" style="margin-top: 1rem;">회원정보 수정</button>
       </div>
     </div>
     <hr>
@@ -30,12 +30,12 @@
             </li>
           </ul>
           <div v-else>
-            {{ (this.$route.query.userid == loginUser.id) ? '영화에 별점을 등록해 보세요!' : '아직 등록한 별점이 없어요'}}
+            {{ (this.$route.params.userid == loginUser.id) ? '영화에 별점을 등록해 보세요!' : '아직 등록한 별점이 없어요'}}
           </div>
         </div>
         <hr>
         <div>
-          <h3>{{ (this.$route.query.userid == loginUser.id) ? '내가' : `${nickname}님이` }} 찜한 영화</h3>
+          <h3>{{ (this.$route.params.userid == loginUser.id) ? '내가' : `${nickname}님이` }} 찜한 영화</h3>
           <ul v-if="cartMovies" class="movieList">
             <li v-for="(cartMovie, index) in cartMovies" :key="index" @click="moveToMovie(cartMovie.id)" class="item profile-movie-item">
               <img v-if="cartMovie.poster_path" :src="moviePoster(cartMovie)" class="poster" alt="poster_img">
@@ -45,13 +45,13 @@
             </li>
           </ul>
           <div v-else>
-            {{ (this.$route.query.userid == loginUser.id) ? '영화를 카트에 담아보세요!' : '아직 찜한 영화가 없어요'}}
+            {{ (this.$route.params.userid == loginUser.id) ? '영화를 카트에 담아보세요!' : '아직 찜한 영화가 없어요'}}
           </div>
         </div>
       </div>
       <hr>
       <div id="articleList">
-        <h3>{{ (this.$route.query.userid == loginUser.id) ? '내가' : `${nickname}님이` }} 작성한 게시글</h3> 
+        <h3>{{ (this.$route.params.userid == loginUser.id) ? '내가' : `${nickname}님이` }} 작성한 게시글</h3> 
         <ul id="article-list" v-if="articleList && !articleList.message">
           <li class="article-list-item" v-for="(article, index) in articleList" :key="index">
             <span class="article-list-item-title" @click="moveToArticle(article.id)">
@@ -60,12 +60,12 @@
           </li>
         </ul>
         <div v-else>
-          {{ (this.$route.query.userid == loginUser.id) ? '커뮤니티에 게시글을 작성해보세요!' : '아직 작성한 게시글이 없어요'}}
+          {{ (this.$route.params.userid == loginUser.id) ? '커뮤니티에 게시글을 작성해보세요!' : '아직 작성한 게시글이 없어요'}}
         </div>
       </div>
       <hr>
       <div id="commentList">
-        <h3>{{ (this.$route.query.userid == loginUser.id) ? '내가' : `${nickname}님이` }} 남긴 영화 한마디</h3> 
+        <h3>{{ (this.$route.params.userid == loginUser.id) ? '내가' : `${nickname}님이` }} 남긴 영화 한마디</h3> 
         <ul id="article-list" v-if="commentList">
           <li class="article-list-item" v-for="(comment, index) in commentList" :key="index">
             <span class="article-list-item-title" @click="moveToMovie(comment.movie)">
@@ -74,12 +74,12 @@
           </li>
         </ul>
         <div v-else>
-          {{ (this.$route.query.userid == loginUser.id) ? '영화에 한마디를 남겨보세요!' : '아직 남긴 영화 한마디가 없어요'}}
+          {{ (this.$route.params.userid == loginUser.id) ? '영화에 한마디를 남겨보세요!' : '아직 남긴 영화 한마디가 없어요'}}
         </div>
       </div>
     </div>
     <div>
-      <a @click="deleteAccount" href="#" style="color: gray;" v-if="(this.$route.query.userid == loginUser.id)">회원탈퇴</a>
+      <a @click="deleteAccount" href="#" style="color: gray;" v-if="(this.$route.params.userid == loginUser.id)">회원탈퇴</a>
     </div>
   </div>
 </template>
@@ -96,7 +96,7 @@ export default {
   name: 'UserProfile',
   data: function () {
     return {
-      userId: this.$route.query.userid,
+      userId: this.$route.params.userid,
       username: '',
       nickname: '',
       profile_path: '',

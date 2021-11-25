@@ -74,7 +74,7 @@ export default {
             username: '',
             password: '',
             passwordConfirmation: '',
-            profile_path: 0,
+            profile_path: null,
           },
           isInvalidPW: false,
           isNotSamePW: false,
@@ -123,7 +123,7 @@ export default {
       },
       // 프로필 사진
       setProfilePath (num) {
-        this.credentials.profile_path = num === undefined ? 0 : num
+        this.credentials.profile_path = num
         this.clickedImg = num
       },
       // 비밀번호
@@ -190,7 +190,7 @@ export default {
             }
           })
             .then(() => {
-              this.$router.push({ path: 'accounts', query: { userid: this.loginUser.id }})
+              this.$router.push({ name: 'UserProfile', params: { userid: this.loginUser.id }})
             })
             .catch(err => {
               console.log(err)
@@ -209,7 +209,7 @@ export default {
             }
           })
             .then(() => {
-              this.$router.push({ name: 'UserProfile', params: { user_id: this.loginUser.id }})
+              this.$router.push({ name: 'UserProfile', params: { userid: this.loginUser.id }})
             })
             .catch(err => {
               console.log(err)

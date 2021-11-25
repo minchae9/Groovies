@@ -9,6 +9,7 @@ export default new Vuex.Store({
     login: false,
     searchKeyword: '',
     selectedMovie: {},
+    isMyself: false,
     loginUser: {
       id: '',
       username: '',
@@ -43,6 +44,9 @@ export default new Vuex.Store({
     },
     LOGIN: function (state) {
       state.login = true
+    },
+    UPDATE_IS_MYSELF: function (state, BOOL) {
+      state.isMyself = BOOL
     },
   },
   actions: {
@@ -96,6 +100,14 @@ export default new Vuex.Store({
     login: function ({ commit }) {
       commit('LOGIN')
     },
+    updateIsMySelf: function ({commit}, BOOL) {
+      commit('UPDATE_IS_MYSELF', BOOL)
+    },
+  },
+  getters: {
+    loginUserId: state => {
+      return state.loginUser.id
+    }
   },
   modules: {
   }

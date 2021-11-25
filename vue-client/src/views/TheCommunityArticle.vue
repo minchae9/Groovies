@@ -69,7 +69,7 @@ export default {
     },
     methods: {
       moveToUserProfile: function (user_id) {
-        this.$router.push({ name: 'UserProfile', params: { user_id: user_id }})
+        this.$router.push({ name: 'UserProfile', params: { userid: user_id }})
       },
       toggleLike: function () {
         if ((this.login === true) && (this.loginUser.id !== '')) {
@@ -113,7 +113,7 @@ export default {
           })
       },
       updateArticle: function (article) {
-        this.$router.push({ name: 'CommunityArticleCreate', query: {article: article.id}})
+        this.$router.push({ name: 'CommunityArticleCreate', query: { article: article.id }})
       },
       deleteArticle: function (article) {
         axios({

@@ -8,7 +8,7 @@
       </div>
 
       <div v-if="!login">
-        <router-link :to="{ name: 'Accounts' }">회원가입</router-link> |
+        <router-link :to="{ name: 'Signup' }">회원가입</router-link> |
         <router-link :to="{ name: 'Login' }">로그인</router-link>
       </div>
 
@@ -16,7 +16,7 @@
         <b>{{ loginUserNickname }}</b>님 환영합니다.
       </div>
       <div v-if="login">
-        <router-link v-if="login" :to="{ name: 'UserProfile', query: { userid: userId }}">마이페이지</router-link> |
+        <router-link v-if="login === true" :to="{ name: 'UserProfile', params: { userid: userId }}">마이페이지</router-link> |
         <router-link to="#" @click.native="logout">로그아웃</router-link>
       </div>
 
@@ -84,13 +84,20 @@ export default {
     loginUserNickname: function () {
       const nickname = this.loginUser.nickname
       return nickname ? nickname : this.loginUser.username
-    }
+    },
+    // loginUserInfo: function () {
+    //   return this.$store.state.loginUser
+    // },
   },
   watch: {
     $route (to, from){
         if (to.name ==='Search' && from.name === 'Home') {
           this.$store.dispatch('onSearch', this.$route.params.keyword) 
         }
+        if (to.name === 'UserProfile') {
+          this.$store.dispatch('updateIsMySelf', this.$store.getters.loginUserId === Number(this.$route.params.userid))
+        }
+
     }
   },
 }
