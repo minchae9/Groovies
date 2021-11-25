@@ -7,7 +7,7 @@
         {{ selectedMovie.title }} ({{ selectedMovie.original_title }})
 
         <!-- cart button -->
-        <button :disabled="login === false" @click="toggleCart" class="cart-button">
+        <button :disabled="login == false" @click="toggleCart" class="cart-button">
           <img src="@/assets/cart_add_2.svg" v-if="!isAddedToCart" alt="cart_add" class="cart-button-icon">
           <img src="@/assets/cart_remove.png" v-if="isAddedToCart" alt="cart_add" class="cart-button-icon">
         </button>
@@ -145,7 +145,7 @@ export default {
         return key ? `https://www.themoviedb.org/t/p/w138_and_h175_face/${key}` : require('@/assets/default_profile_img.jpg')
       },
       toggleCart: function () {
-        if ((this.login === true) && (this.loginUser.id !== '')) {
+        if ((this.login == true) && (this.loginUser.id != '')) {
           // 로그인한 사용자면
           axios({
             method: 'post',
@@ -161,7 +161,7 @@ export default {
         }
       },
       rate: function (event) {
-        if ((this.login === true) && (this.loginUser.id !== '')) {
+        if ((this.login == true) && (this.loginUser.id != '')) {
           // 로그인된 상태면
           const targetScore = event.target.dataset.score
 
@@ -212,7 +212,7 @@ export default {
           headers: AUTH_JWT_TOKEN
         })
         .then((res) => {
-          this.myCart = res.status === 204? [] : res.data
+          this.myCart = res.status == 204? [] : res.data
           this.isAddedToCart =  this.myCart.map(item => item.id).includes(this.selectedMovie.id) ? true : false
         })
         .catch(err => {
@@ -240,7 +240,7 @@ export default {
           })
         })
         .catch(err => {
-          if (err.response.status === 404) {
+          if (err.response.status == 404) {
             this.ratingScore = 0
           } else {
             console.log(err)
@@ -248,7 +248,7 @@ export default {
         })
       },
       updateLoginState: function () {
-        if ((this.login === true) && (this.loginUser.id !== '')) {
+        if ((this.login == true) && (this.loginUser.id != '')) {
           //ratings 버튼
           this.ratingModal = ''
           this.ratingClose = ''
@@ -261,7 +261,7 @@ export default {
       updateStates: function () {
         this.updateLoginState(this.loginUser)
 
-        if ((this.login === true) && (this.loginUser.id !== '')) {
+        if ((this.login == true) && (this.loginUser.id != '')) {
           this.updateCartState()
           this.updateRatingState()
         }
@@ -311,7 +311,7 @@ export default {
       if (this.selectedMovie.id) {
         this.updateStates()
       } else {
-        if (this.selectedMovie.id !== this.movie_id) {
+        if (this.selectedMovie.id != this.movie_id) {
           this.$store.dispatch('getMovieDetail', this.movie_id)
         }
       }
@@ -397,15 +397,6 @@ export default {
     font-size: 1.25rem;
     font-family: scd6;
   }
-
-  /* #detail-body-right img,
-  #detail-body-similar img {
-    margin-right: 1rem;
-    margin-bottom: 0.5rem;
-    width: 138px;
-    height: 175px;
-    object-fit: cover;
-  } */
 
   .item img {
     margin-right: 1rem;

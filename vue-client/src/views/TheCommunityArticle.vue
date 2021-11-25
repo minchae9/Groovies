@@ -16,8 +16,8 @@
         </div>
         <div id="article-content-box">
             <div id="article-content-btn-box">
-              <button @click="updateArticle(article)" v-if="((login === true) && (article.user === loginUser.id))" class="btn btn-secondary article-button">수정</button>
-              <button @click="deleteArticle(article)" v-if="((login === true) && (article.user === loginUser.id))" class="btn btn-secondary article-button">삭제</button>
+              <button @click="updateArticle(article)" v-if="((login == true) && (article.user == loginUser.id))" class="btn btn-secondary article-button">수정</button>
+              <button @click="deleteArticle(article)" v-if="((login == true) && (article.user == loginUser.id))" class="btn btn-secondary article-button">삭제</button>
             </div>
           <div v-if="article.movie_title">
             <p>영화: <b>《 {{ article.movie_title }} 》</b></p>
@@ -29,7 +29,7 @@
         </div>
       </div>
 
-        <button v-if="login === true" id="like-button" @click="toggleLike">
+        <button v-if="login == true" id="like-button" @click="toggleLike">
           <i class="fa-heart" :class="[{ fas: likeState }, { far: !likeState }]"></i>
           <span>{{likeUsersCount}}</span>
         </button>
@@ -72,7 +72,7 @@ export default {
         this.$router.push({ name: 'UserProfile', params: { userid: user_id }})
       },
       toggleLike: function () {
-        if ((this.login === true) && (this.loginUser.id !== '')) {
+        if ((this.login == true) && (this.loginUser.id != '')) {
           // 좋아요 정보 저장하기
         axios({
           method: 'post',
@@ -84,7 +84,7 @@ export default {
             console.log(err)
           })
         // 하트와 좋아요 수 변경
-        if ((this.login === true) && (this.loginUser.id !== '')) {
+        if ((this.login == true) && (this.loginUser.id != '')) {
           if (this.likeState) {
             this.likeState = false
             if (this.likeUsersCount > 0) {

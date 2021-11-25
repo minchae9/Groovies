@@ -9,7 +9,7 @@
             {{ selectedMovie.title }} ({{ selectedMovie.original_title }})
     
             <!-- cart button -->
-            <button :disabled="login === false" @click="toggleCart" class="cart-button" :data-bs-dismiss="ratingModal" :aria-label="ratingClose">
+            <button :disabled="login == false" @click="toggleCart" class="cart-button" :data-bs-dismiss="ratingModal" :aria-label="ratingClose">
               <img src="@/assets/cart_add_2.svg" v-if="!isAddedToCart" alt="cart_add" class="cart-button-icon">
               <img src="@/assets/cart_remove.png" v-if="isAddedToCart" alt="cart_add" class="cart-button-icon">
             </button>
@@ -102,7 +102,7 @@ export default {
         this.$router.push({ name: 'MovieDetail',  params: { movie_id: this.selectedMovie.id }})
       },
       toggleCart: function () {
-        if ((this.login === true) && (this.loginUser.id !== '')) {
+        if ((this.login == true) && (this.loginUser.id != '')) {
           // 로그인한 사용자면
           axios({
             method: 'post',
@@ -122,14 +122,14 @@ export default {
         this.$store.dispatch('onSearch', genre)
       },
       updateCartState: function () {
-        if ((this.login === true) && (this.loginUser.id !== '')) {
+        if ((this.login == true) && (this.loginUser.id != '')) {
           axios({
             method: 'get',
             url: `${SERVER_URL}/accounts/mycart/`,
             headers: AUTH_JWT_TOKEN
           })
           .then((res) => {
-            this.myCart = res.status === 204? [] : res.data
+            this.myCart = res.status == 204? [] : res.data
             this.isAddedToCart =  this.myCart.map(item => item.id).includes(this.selectedMovie.id) ? true : false
           })
           .catch(err => {
@@ -138,7 +138,7 @@ export default {
         }
       },
       updateLoginState: function () {
-        if ((this.login === true) && (this.loginUser.id !== '')) {
+        if ((this.login == true) && (this.loginUser.id != '')) {
           //ratings 버튼
           this.ratingModal = ''
           this.ratingClose = ''
@@ -150,7 +150,7 @@ export default {
       },
       updateStates: function () {
         this.updateLoginState()
-        if ((this.login === true) && (this.loginUser.id !== '')) {
+        if ((this.login == true) && (this.loginUser.id != '')) {
           this.updateCartState()
         }
       },

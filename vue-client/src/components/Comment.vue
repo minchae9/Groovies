@@ -15,19 +15,19 @@
               <div class="comment-content">{{ comment.content }}</div>
               <div class="comment-created-at">{{ comment.created_at | convertFormat }}</div>
               <button @click="deleteComment(comment)" 
-              v-if="((login === true) && (comment.user === loginUser.id))" class="btn btn-secondary article-button">삭제</button>
+              v-if="((login == true) && (comment.user == loginUser.id))" class="btn btn-secondary article-button">삭제</button>
             </li>
           </ul>
       </div>
 
       <div id="comment-input-box">
-        <textarea v-if="login === true" id="comment-input" placeholder="댓글을 입력해주세요 :)"
+        <textarea v-if="login == true" id="comment-input" placeholder="댓글을 입력해주세요 :)"
         :commentInput="commentInput" @input="onCommentInput" @keypress.enter="createComment"
         ></textarea>
         <textarea v-else id="comment-input" placeholder="댓글을 작성하려면 로그인해주세요!"
         :commentInput="commentInput" @input="onCommentInput" @keypress.enter="createComment" disabled
         ></textarea>
-        <button :disabled="login === false" id="comment-button" @click="createComment" class="btn btn-primary">작성</button>
+        <button :disabled="login == false" id="comment-button" @click="createComment" class="btn btn-primary">작성</button>
       </div>
   </div>
 </template>

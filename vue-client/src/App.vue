@@ -12,11 +12,11 @@
         <router-link :to="{ name: 'Login' }">로그인</router-link>
       </div>
 
-      <div v-if="login === true" id="greeting">
+      <div v-if="login == true" id="greeting">
         <b>{{ loginUserNickname }}</b>님 환영합니다.
       </div>
       <div v-if="login">
-        <router-link v-if="login === true" :to="{ name: 'UserProfile', params: { userid: userId }}">마이페이지</router-link> |
+        <router-link v-if="login == true" :to="{ name: 'UserProfile', params: { userid: userId }}">마이페이지</router-link> |
         <router-link to="#" @click.native="logout">로그아웃</router-link>
       </div>
 
@@ -91,11 +91,11 @@ export default {
   },
   watch: {
     $route (to, from){
-        if (to.name ==='Search' && from.name === 'Home') {
+        if (to.name == 'Search' && from.name == 'Home') {
           this.$store.dispatch('onSearch', this.$route.params.keyword) 
         }
-        if (to.name === 'UserProfile') {
-          this.$store.dispatch('updateIsMySelf', this.$store.getters.loginUserId === Number(this.$route.params.userid))
+        if (to.name == 'UserProfile') {
+          this.$store.dispatch('updateIsMySelf', this.$store.getters.loginUserId == Number(this.$route.params.userid))
         }
 
     }
