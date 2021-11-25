@@ -1,31 +1,31 @@
 <template>
   <div id="CommunityArticleCreate">
-    <div id="community-article-create">
-
-      <div class="article-create-input-box">
-        <label for="title">제목 <span class="split-bar">|</span></label>
-        <input v-model="article.title" type="text" id="title" placeholder="제목을 입력하세요" class="input-style">
-      </div>
-
+    <div id="community-article">
+      <div id="article-body">
+        <label for="title">제목: </label>
+        <input v-model="article.title" type="text" id="title" style="width: 20rem;" placeholder="제목을 입력하세요">
         <div id="article-header">
           <div>
             작성자: {{ loginUser.nickname ? loginUser.nickname : loginUser.username }} ({{ loginUser.username }})
           </div>
         </div>
-
-      <div class="article-create-input-box">
-        <label for="movie_title">영화 제목 <span class="split-bar">|</span></label>
-        <input v-model="article.movie_title" type="text" id="movie_title" placeholder="영화 제목을 입력하세요" class="input-style">
       </div>
-      <div class="article-create-input-box">
-          <label for="content" class="label-content">내용 <span class="split-bar">|</span></label>
-          <textarea v-model="article.content" class="textarea" id="content" placeholder="내용을 입력하세요" rows="10"></textarea>
+      <div>
+        <p>
+          <label for="movie_title">영화 제목:</label>
+          <input v-model="article.movie_title" type="text" id="movie_title" placeholder="영화 제목을 입력하세요">
+        </p>
       </div>
-    </div>
-
-    <div id="article-footer">
-      <button v-if="this.$route.query.article > 0" @click="updateArticle" class="btn btn-primary">수정</button>
-      <button v-else @click="createArticle" class="btn btn-primary">작성</button>
+      <div id="article-content-box">
+        <p id="article-content">
+          <label for="content">내용:</label>
+          <textarea v-model="article.content" class="textarea" id="content" placeholder="내용을 입력하세요"></textarea>
+        </p>
+      </div>
+      <div id="article-footer">
+        <button v-if="this.$route.query.article > 0" @click="updateArticle" class="btn btn-primary">수정</button>
+        <button v-else @click="createArticle" class="btn btn-primary">작성</button>
+      </div>
     </div>
   </div>
 </template>
@@ -103,48 +103,5 @@ export default {
 </script>
 
 <style>
-
-#community-article-create {
-    width: 70%;
-    max-width: 768px;
-    margin: 0 auto;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-    text-align: left;
-  }
-
-  #community-article-create label {
-    text-align: right;
-    margin-right: 0.5rem;
-    align-self: center;
-  }
-
-  #community-article-create .label-content {
-    align-self: start;
-  }
-
-  #community-article-create input {
-    font-size: 0.875rem;
-    padding: 0.25rem;
-    display: block;
-  }
-
-  #community-article-create textarea {
-    margin: 0;
-    border-radius: 4px;
-    font-size: 0.875rem;
-    padding: 0.25rem;
-  }
-
-  .article-create-input-box {
-    display: grid;
-    grid-template-columns: 6rem 1fr;
-    margin-top: 0.5rem;
-  }
-
-  #article-create-footer {
-    display: flex;
-    justify-content: center;
-  }
 
 </style>
