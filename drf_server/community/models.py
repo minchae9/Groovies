@@ -19,6 +19,7 @@ class Comment(models.Model):
     content = models.TextField()
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="articlecomment")
-
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.content
