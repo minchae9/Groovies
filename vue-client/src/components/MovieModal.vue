@@ -25,7 +25,7 @@
             <span v-if="selectedMovie.runtime">{{ selectedMovie.runtime | convertToTime }}</span> <span class="split-bar">|</span>
             
             <!-- average rate -->
-            <span>평점 {{ selectedMovie.vote_average }}</span>
+            <span>평점 {{ selectedMovie.vote_average > 0 ? selectedMovie.vote_average : '정보 없음' }}</span>
           </div>
 
           <div>

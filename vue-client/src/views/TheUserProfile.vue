@@ -137,6 +137,7 @@ export default {
     },
     moveToMovie: function (movie_id) {
       this.$router.push({ name: 'MovieDetail', params: { movie_id: movie_id }})
+      this.$router.go()
     },
     moveToArticle: function (article_id) {
       this.$router.push({ name: 'CommunityArticle', params: { article_id: article_id }})
@@ -212,7 +213,14 @@ export default {
       'login',
       'loginUser',
     ]),
-  }
+  },
+  watch: {
+    $route (to, from){
+        if (to.name == 'UserProfile' && from.name == 'UserProfile' && to.params.userid !== from.params.userid) {
+          this.$router.go()
+        }
+    }
+  },
 }
 </script>
 

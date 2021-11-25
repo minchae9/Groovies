@@ -1,14 +1,15 @@
 
-# Created by https://www.toptal.com/developers/gitignore/api/venv,vuejs,django,python,visualstudiocode,git,windows
-# Edit at https://www.toptal.com/developers/gitignore?templates=venv,vuejs,django,python,visualstudiocode,git,windows
+# Created by https://www.toptal.com/developers/gitignore/api/venv,python,django,visualstudiocode,windows,git
+# Edit at https://www.toptal.com/developers/gitignore?templates=venv,python,django,visualstudiocode,windows,git
 
 ### Django ###
 *.log
 *.pot
 *.pyc
 __pycache__/
+# fixtures
 local_settings.py
-#db.sqlite3
+# db.sqlite3
 db.sqlite3-journal
 media
 
@@ -121,13 +122,14 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+# .env
 .venv
 env/
 venv/
 ENV/
 env.bak/
 venv.bak/
+
 
 # Spyder project settings
 .spyderproject
@@ -263,13 +265,6 @@ pip-selfcheck.json
 # Support for Project snippet scope
 !.vscode/*.code-snippets
 
-### Vuejs ###
-# Recommended template: Node.gitignore
-
-node_modules/
-npm-debug.log
-yarn-error.log
-
 ### Windows ###
 # Windows thumbnail cache files
 Thumbs.db
@@ -296,4 +291,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/venv,vuejs,django,python,visualstudiocode,git,windows
+# End of https://www.toptal.com/developers/gitignore/api/venv,python,django,visualstudiocode,windows,git

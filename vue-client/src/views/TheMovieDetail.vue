@@ -20,7 +20,7 @@
       <div>
         {{ selectedMovie.release_date | getDate }} <span class="split-bar">|</span>
         <span v-if="selectedMovie.runtime">{{ selectedMovie.runtime | convertToTime }}</span> <span class="split-bar">|</span>
-        <span v-if="selectedMovie.vote_average">평점 <span style="font-family:scd5;">{{ selectedMovie.vote_average }}</span></span> <span class="split-bar">|</span>
+        <span>평점 <span style="font-family:scd5;">{{ selectedMovie.vote_average > 0 ? selectedMovie.vote_average : '정보 없음'}}</span></span> <span class="split-bar">|</span>
         
         <!-- rating -->
         <span class="rating" @click="rate">
