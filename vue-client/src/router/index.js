@@ -24,14 +24,14 @@ const routes = [
     component: Community
   },
   {
-    path: '/community/:article_id',
-    name: 'CommunityArticle',
-    component: CommunityArticle
-  },
-  {
     path: '/community/create',
     name: 'CommunityArticleCreate',
     component: CommunityArticleCreate
+  },
+  {
+    path: '/community/:article_id',
+    name: 'CommunityArticle',
+    component: CommunityArticle
   },
   {
     path: '/search/:keyword?',

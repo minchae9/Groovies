@@ -2,103 +2,99 @@
   <div id="app">
     <div id="nav">
       <div>
-        <router-link :to="{ name: 'Home' }"><img src="@/assets/logo.png" alt="logo" class="mainlogo"></router-link> |
+        <router-link :to="{ name: 'Home' }" :userId="userId"><img src="@/assets/logo.png" alt="logo" class="mainlogo"></router-link> |
         <router-link :to="{ name: 'Search' }">영화 검색</router-link> |
-        <router-link :to="{ name: 'Community' }">커뮤니티</router-link>
+        <router-link :to="{ name: 'Community' }" :login="login">커뮤니티</router-link>
       </div>
+
       <div v-if="!login">
         <router-link :to="{ name: 'Signup' }">회원가입</router-link> |
         <router-link :to="{ name: 'Login' }">로그인</router-link>
       </div>
-      <div v-if="login">
+
+      <div v-if="login === true" id="greeting">
         <b>{{ loginUserNickname }}</b>님 환영합니다.
       </div>
       <div v-if="login">
-        <router-link v-if="login" :to="{ name: 'UserProfile', params: { user_id: loginUserInfo.user_id }}">마이페이지</router-link> |
+        <router-link v-if="login" :to="{ name: 'UserProfile', params: { user_id: userId }}">마이페이지</router-link> |
         <router-link to="#" @click.native="logout">로그아웃</router-link>
       </div>
+
     </div>
-    <router-view id="content" @login="login=true" @getUserInfo="getUserInfo"/>
+    <router-view id="content" @getUserBasics="getUserBasics"/>
     <div id="footer"></div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import { mapState } from 'vuex'
+
+const SERVER_URL = process.env.VUE_APP_SERVER_URL
 
 export default {
   name: 'App',
   data: function () {
     return {
-      login: false,
-      // 현재 로그인한 유저 정보
-      userInfo: {
-        user_id: '',
-        username: '',
-      }
+      userId: '',
     }
   },
   methods: {
     logout: function () {
-      localStorage.removeItem('jwt')
-        this.login=false
+        localStorage.removeItem('jwt')
         this.$store.dispatch('logout')
         this.$router.push({ name: 'Home' })
+        this.$router.go()
     },
-
     // 현재 로그인한 유저 정보 받기
-    getUserInfo: function () {
-      if (localStorage.getItem('jwt')) {
-      // 유저 정보 추출
-      const JWTtoken = localStorage.getItem('jwt')
-      const base64Payload = JWTtoken.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE 
-      const payload = Buffer.from(base64Payload, 'base64'); 
-      const result = JSON.parse(payload.toString()) 
-      // console.log(result)
-      this.userInfo.user_id = result.user_id
-      this.userInfo.username = result.username
-      // console.log(this.userInfo)
-      this.$store.dispatch('storeLoginUser', this.userInfo)
-      this.getUserOthers()
+    getUserBasics: function () {
+        if (localStorage.getItem('jwt')) {
+        // 유저 정보 추출
+        const JWTtoken = localStorage.getItem('jwt')
+        const base64Payload = JWTtoken.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE 
+        const payload = Buffer.from(base64Payload, 'base64'); 
+        const result = JSON.parse(payload.toString()) 
+        this.userId = result.user_id
+        this.getUserInfo()
       }    
     },
-    getUserOthers: function () {
-      axios({
-        method: 'get',
-        url: `http://127.0.0.1:8000/accounts/profile/${this.userInfo.user_id}/`
+    getUserInfo: function () {
+      axios.get(`${SERVER_URL}/accounts/profile/${this.userId}/`)
+      .then((res) => {
+        this.$store.dispatch('getUserInfo', res.data)
+      }) 
+      .catch(err => {
+        console.log(err)
       })
-        .then((res) => {
-          this.$store.dispatch('getUserOthers', res.data.nickname, res.data.profile_path)
-        }) 
-        .catch(err => {
-          console.log(err)
-        })
     },
-    
   },
   created: function () {
     const token = localStorage.getItem('jwt')
     // 토큰이 있다면 this.login을 true로 변경
     if (token) {
-      this.login = true
+      this.$store.dispatch('login')
+      this.getUserBasics()
       this.getUserInfo()
-      this.getUserOthers()
+    }
+  },
+  computed: {
+    ...mapState([
+      'login',
+      'loginUser'
+    ]),
+    loginUserNickname: function () {
+      const nickname = this.loginUser.nickname
+      return nickname ? nickname : this.loginUser.username
     }
   },
   watch: {
     $route (to, from){
-      if (to.name ==='Search' && from.name === 'Home') {
-        this.$store.dispatch('onSearch', this.$route.params.keyword) 
-      }
-    }
-  },
-  computed: {
-    loginUserInfo: function () {
-      return this.$store.state.loginUser
-    },
-    loginUserNickname: function () {
-      const nickname = this.$store.state.loginUser_nickname
-      return nickname ? nickname : this.$store.state.loginUser.username
+        if (to.name ==='Search' && from.name === 'Home') {
+          this.$store.dispatch('onSearch', this.$route.params.keyword) 
+        }
+        if (to.name === 'UserProfile') {
+          this.$store.dispatch('updateIsMySelf', this.$store.getters.loginUserId === this.$route.params.user_id)
+        }
     }
   },
 }
@@ -150,16 +146,20 @@ export default {
 .btn-check:focus + .btn-primary, .btn-primary:focus {
   color: #fff;
   background-color: rgb(112,34,171) !important;
+  border-color: rgb(112,34,171) !important;
   box-shadow: 0 0 0 0.25rem rgb(112,34,171, 0.5) !important;
 }
 
 /* override bootstrap */
 textarea:hover, 
-input:hover, 
+input[type="text"]:hover, 
+input[type="text"]:active, 
+input[type="text"]:focus,
+input[type="password"]:hover, 
+input[type="password"]:active, 
+input[type="password"]:focus,
 textarea:active, 
-input:active, 
 textarea:focus, 
-input:focus,
 button:focus,
 button:active,
 button:hover,
@@ -167,9 +167,9 @@ label:focus,
 .btn:active,
 .btn.active
 {
-  outline: none !important;
-  -webkit-appearance:none;
-  box-shadow: none !important;
+    outline: none !important;
+    -webkit-appearance:none;
+    box-shadow: none !important;
 }
 
 .logo {
@@ -250,5 +250,11 @@ body {
   -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr='#2B9CD7', endColorstr='#7022AB' ,GradientType=0)";
   background : linear-gradient(240deg, rgba(43, 156, 215, 1) 0%, rgba(70, 109, 198, 1) 34.74%, rgba(100, 55, 179, 1) 78.25%, rgba(112, 34, 171, 1) 99.44%);
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#2B9CD7',endColorstr='#7022AB' , GradientType=1);
+}
+
+@media screen and (max-width: 992px) {
+  #nav > #greeting {
+    display: none;
+  }
 }
 </style>

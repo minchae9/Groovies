@@ -1,7 +1,7 @@
 <template>
   <div id="login">
     <div class="page-title">
-      <div>로그인</div> 
+      <h1>로그인</h1> 
       <div class="line"></div>
     </div>
     <div id="login-form">
@@ -46,11 +46,13 @@ export default {
             // 토큰을 로컬 저장소에 저장하기
             localStorage.setItem('jwt', res.data.token)
             this.token = res.data.token
-            // 로그인
-            this.$emit('getUserInfo')
+            
+            this.$emit('getUserBasics')
 
             // App.vue에 로그인됐음을 알림
-            this.$emit('login')
+            // this.$emit('login')
+            this.$store.dispatch('login')
+
             this.$router.push({ name: 'Home' })
           })
           .catch(() => {

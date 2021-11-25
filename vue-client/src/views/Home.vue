@@ -1,8 +1,8 @@
 <template>
   <div>
-    <carousel id="carousel" :carouselItems="carousel_items"></carousel>
-    <search-bar id="home-search-bar"></search-bar>
-    <movie-list :movieItems="recommendations"></movie-list>
+      <carousel id="carousel" :carouselItems="carouselItems"></carousel>
+      <search-bar id="home-search-bar"></search-bar>
+      <movie-list :movieItems="recommendations"></movie-list>
   </div>
 </template>
 
@@ -11,71 +11,32 @@ import Carousel from '../components/Carousel.vue'
 import SearchBar from '../components/SearchBar.vue'
 import MovieList from '../components/MovieList.vue'
 import axios from 'axios'
-// import _ from 'lodash'
+
+const SERVER_URL = process.env.VUE_APP_SERVER_URL
 
 export default {
+    name: 'Home',
     components: { 
         Carousel, 
         SearchBar, 
         MovieList, 
     },
-    name: 'Home',
+    props: {
+        userId: Number,
+    },
     data: function () {
         return {
             recommendations: [],
-            carousel_items: [
-                {
-                    id: 0,
-                    title: '',
-                    tagline: '',
-                    release_date: '',
-                    poster_path: '',
-                },
-                {
-                    id: 1,
-                    title: '',
-                    tagline: '',
-                    release_date: '',
-                    poster_path: '',
-                },
-                {
-                    id: 2,
-                    title: '',
-                    tagline: '',
-                    release_date: '',
-                    poster_path: '',
-                },
-                {
-                    id: 3,
-                    title: '',
-                    tagline: '',
-                    release_date: '',
-                    poster_path: '',
-                },
-                {
-                    id: 4,
-                    title: '',
-                    tagline: '',
-                    release_date: '',
-                    poster_path: '',
-                },
-            ],
+            carouselItems: [],
         }
     },
-    methods: {
-        
-    },
     created: function () {
-        // axios
-        // 추천 영화 가져오기
-        axios({
-            method: 'get', 
-            url: 'http://127.0.0.1:8000/movies/recommendation'
-        })
+        this.$emit('getUserBasics')
+        // 영화 가져오기
+        axios.get(`${SERVER_URL}/movies/recommendation/`)
             .then(res => {
-                // console.log(res)
                 this.recommendations = res.data.recommendations
-                this.carousel_items = res.data.carousel_items
+                this.carouselItems = res.data.carouselItems
             })
             .catch(err => {
                 console.log(err)

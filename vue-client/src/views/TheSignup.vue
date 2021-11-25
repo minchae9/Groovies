@@ -1,39 +1,47 @@
 <template>
   <div id="signup">
     <div class="page-title">
-      <div v-if="this.$store.state.loginUser">회원 정보 수정</div> 
-      <div v-else>회원가입</div> 
+      <h1 v-if="isLoggedIn">회원 정보 수정</h1> 
+      <h1 v-else>회원가입</h1> 
       <div class="line"></div>
     </div>
     <div id="signup-form">
       <div>
         <p>프로필 사진</p>
         <br>
-        <a href="#"><img :class="{ click: credentials.profile_path === 0 }" @click="setProfilePath(0)" src="@/assets/profile_img_0.jpg" alt="0번_프로필" class="profile"></a>
-        <a href="#"><img :class="{ click: credentials.profile_path === 1 }" @click="setProfilePath(1)" src="@/assets/profile_img_1.jpg" alt="1번_프로필" class="profile"></a>
-        <a href="#"><img :class="{ click: credentials.profile_path === 2 }" @click="setProfilePath(2)" src="@/assets/profile_img_2.jpg" alt="2번_프로필" class="profile"></a>
-        <a href="#"><img :class="{ click: credentials.profile_path === 3 }" @click="setProfilePath(3)" src="@/assets/profile_img_3.jpg" alt="3번_프로필" class="profile"></a>
-        <a href="#"><img :class="{ click: credentials.profile_path === 4 }" @click="setProfilePath(4)" src="@/assets/profile_img_4.jpg" alt="4번_프로필" class="profile"></a>
+        <img v-for="(x, idx) in new Array(5)" :key="idx"
+        :class="{ click: credentials.profile_path === idx }" 
+        @click="setProfilePath(idx)" :src="require(`@/assets/profile_img_${idx}.jpg`)" 
+        :alt="`${idx}번_프로필`" class="profile">
       </div>
       <br>
       <br>
       <div>
         <label for="nickname">닉네임:</label>
-        <input v-if="this.$store.state.loginUser" type="text" id="nickname" v-model="credentials.nickname" :class="{ red: checkValidNickname }" :placeholder="this.nickname">
+        <input v-if="isLoggedIn" type="text" id="nickname" v-model="credentials.nickname" :class="{ red: checkValidNickname }" :placeholder="this.$store.state.loginUser_nickname">
         <input v-else type="text" id="nickname" v-model="credentials.nickname" :class="{ red: checkValidNickname }">
         <p class="tag" v-if="credentials.nickname" v-show="!checkValidNickname">사용 가능한 닉네임입니다.</p>
-        <p class="tag invalid" v-if="credentials.nickname" v-show="checkValidNickname && !nickname">이미 사용중인 닉네임입니다.</p>
+        <p class="tag invalid" v-if="credentials.nickname" v-show="checkValidNickname">이미 사용중인 닉네임입니다.</p>
+
+        <!-- <input type="text" id="nickname" :value="credentials.nickname" @input="onInputNickname" :class="{ red: checkValidNickname }">
+        <p class="tag" :class="{ invalid : checkValidNickname }" v-if="credentials.nickname">{{ nicknameNotice }}</p> -->
+
       </div>
       <div>
         <label for="username">아이디:</label>
-        <input v-if="this.$store.state.loginUser" type="text" id="username" :value="this.username" :class="{ red: checkValidUsername }" readonly>
+        <input v-if="isLoggedIn" type="text" id="username" :value="loginUser.username" :class="{ red: checkValidUsername }" readonly disabled>
         <input v-else type="text" id="username" v-model="credentials.username" :class="{ red: checkValidUsername }">
         <p class="tag" v-if="credentials.username" v-show="!checkValidUsername">사용 가능한 아이디입니다.</p>
-        <p class="tag invalid" v-if="credentials.username" v-show="checkValidUsername && !username">이미 사용중인 아이디입니다.</p>
+        <p class="tag invalid" v-if="credentials.username" v-show="checkValidUsername">이미 사용중인 아이디입니다.</p>
+
+        <!-- <input type="text" id="username" :value="credentials.username" @input="onInputUsername" :class="{ red: checkValidUsername }">
+        <p class="tag" :class="{ invalid : checkValidUsername }" v-if="credentials.username">{{ usernameNotice }}</p> -->
       </div>
+
       <div>
         <label for="password">비밀번호:</label>
-        <input type="password" id="password" v-model="credentials.password" @input="[checkValidPW(), checkSamePW()]" :class="{ red: isInvalidPW }">
+        <input type="password" id="password" v-model="credentials.password" @input="[checkValidPW(), checkSamePW()]"
+        :class="{ red: isInvalidPW }">
         <p class="tag">* 영문, 숫자를 모두 포함하여 8자리 이상</p>
       </div>
       <div>
@@ -42,45 +50,65 @@
         @input="[checkValidPW(), checkSamePW()]" :class="{ red: isNotSamePW }">
       </div>
       <p class="notice" :class="{ shown: isNotSamePW }">비밀번호가 일치하지 않습니다!</p>
-      <div v-if="!this.$store.state.loginUser">
-        <label for="agree" style="cursor: pointer;">회원가입에 동의합니다.</label>
-        <input type="checkbox" id="agree">
-        
+
+      <div v-if="!isLoggedIn">
+        <input type="checkbox" id="agree" style="display: none;">
+        <label for="agree" style="cursor: pointer;">
+          <div id="custom-checkbox" @click="toggleCheckBox"></div>
+        </label>
+        <label for="agree" style="cursor: pointer;" @click="toggleCheckBox">회원가입에 동의합니다!</label>
       </div>
-      <button v-if="this.$store.state.loginUser !== null" @click="update">회원정보 수정</button>
-      <button v-else @click="signup">회원가입</button>
+      <button v-if="isLoggedIn" @click="update" class="btn btn-primary" :disabled="!isValidForm">회원정보 수정</button>
+      <button v-else @click="signup" class="btn btn-primary" :disabled="!isValidForm">회원가입</button>
     </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import { mapState } from 'vuex'
 
 export default {
     name: 'Signup',
     data: function () {
         return {
-          credentials: {  // 새 정보
+          credentials: {
             nickname: '',
             username: '',
             password: '',
             passwordConfirmation: '',
-            profile_path: null,
+            profile_path: 0,
           },
-          user_id: '',
-          username: '',  // 기존 사용자 아이디
-          nickname: '', // 기존 사용자 닉네임
-          profile_path: '', // 기존 사용자 프로필 사진
+          notice: {
+            nickname: '',
+            username: '',
+            password: '',
+          },
           isInvalidPW: false,
           isNotSamePW: false,
-          existingUsername: [],
-          existingNickname: [],
+          existingUsernames: [],
+          existingNicknames: [],
         }
     },
     methods: {
+      toggleCheckBox: function () {
+        const box = document.querySelector('#custom-checkbox')
+        if (box.classList.contains('focus')) {
+          box.classList.remove('focus')
+        } else {
+          box.classList.add('focus')
+        }
+      },
+      onInputNickname: function (event) {
+        this.credentials.nickname = event.target.value
+      },
+      onInputUsername: function (event) {
+        this.credentials.username = event.target.value
+      },
       signup: function () {
         const agreed = document.querySelector('#agree').checked
         if (!this.checkValidUsername && !this.checkValidNickname && !this.isInvalidPW && !this.isNotSamePW && agreed) {
+          // 회원가입 가능
           axios({
             method: 'post',
             url: 'http://127.0.0.1:8000/accounts/signup/',
@@ -99,15 +127,12 @@ export default {
               this.$router.go()
             })
 
-        } else {
-          console.log('회원가입 불가! 정보 입력을 모두 완료해주세요.')
         }
       },
       // 프로필 사진
       setProfilePath (num) {
-        this.credentials.profile_path = num
+        this.credentials.profile_path = num === undefined ? 0 : num
         this.clickedImg = num
-        // console.log(this.credentials.profile_path)
       },
       // 비밀번호
       checkValidPW: function () {
@@ -139,12 +164,11 @@ export default {
           url: 'http://127.0.0.1:8000/accounts/profile/'
         })
           .then(res => {
-            // console.log(res)
             const userList = []
             for (let i=0; i < res.data.length ; i++) {
               userList.push(res.data[i].username)
             }
-            this.existingUsername = userList
+            this.existingUsernames = userList
           })
           .catch(err => {
             console.log(err)
@@ -157,12 +181,11 @@ export default {
           url: 'http://127.0.0.1:8000/accounts/profile/'
         })
           .then(res => {
-            // console.log(res)
             const userList = []
             for (let i=0; i < res.data.length ; i++) {
               userList.push(res.data[i].nickname)
             }
-            this.existingNickname = userList
+            this.existingNicknames = userList
           })
           .catch(err => {
             console.log(err)
@@ -170,21 +193,20 @@ export default {
       },
       update: function () {
         //axios
-        if (this.credentials.nickname) {
+        if (this.credentials.nickname !== '') {
           axios({
             method: 'put',
-            url: `http://127.0.0.1:8000/accounts/profile/${this.user_id}/update/`,
+            url: `http://127.0.0.1:8000/accounts/profile/${this.loginUser.user_id}/update/`,
             headers: { Authorization: `JWT ${localStorage.getItem('jwt')}` },
             data: {
               profile_path: this.credentials.profile_path,
-              username: this.username,
               nickname: this.credentials.nickname,
               password: this.credentials.password,
               passwordConfirmation: this.credentials.passwordConfirmation
             }
           })
             .then(() => {
-              this.$router.push({ name: 'UserProfile', params: { user_id: this.user_id }})
+              this.$router.push({ name: 'UserProfile', params: { user_id: this.loginUser.user_id }})
             })
             .catch(err => {
               console.log(err)
@@ -192,18 +214,17 @@ export default {
         } else {
           axios({
             method: 'put',
-            url: `http://127.0.0.1:8000/accounts/profile/${this.user_id}/update/`,
+            url: `http://127.0.0.1:8000/accounts/profile/${this.loginUser.user_id}/update/`,
             headers: { Authorization: `JWT ${localStorage.getItem('jwt')}` },
             data: {
               profile_path: this.credentials.profile_path,
-              username: this.username,
-              nickname: this.nickname,
+              nickname: this.loginUser_nickname,
               password: this.credentials.password,
               passwordConfirmation: this.credentials.passwordConfirmation
             }
           })
             .then(() => {
-              this.$router.push({ name: 'UserProfile', params: { user_id: this.user_id }})
+              this.$router.push({ name: 'UserProfile', params: { user_id: this.loginUser.user_id }})
             })
             .catch(err => {
               console.log(err)
@@ -213,59 +234,49 @@ export default {
       },
     },
     created: function () {
-      // 유저 정보 추출 (1)
-      if (localStorage.getItem('jwt')) {
-        const JWTtoken = localStorage.getItem('jwt')
-        const base64Payload = JWTtoken.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE 
-        const payload = Buffer.from(base64Payload, 'base64'); 
-        const result = JSON.parse(payload.toString()) 
-        this.user_id = result.user_id
-        this.username = result.username
-
-        // 유저 정보 (2)
-        axios({
-          method: 'get',
-          url: `http://127.0.0.1:8000/accounts/profile/${this.user_id}/`
-        })
-          .then(res => {
-            // this.username = res.data.username
-            this.nickname = res.data.nickname
-            this.profile_path = res.data.profile_path
-            this.credentials.profile_path = res.data.profile_path // 기존 사용자 정보 등록
-          })
-          .catch(err => {
-            console.log(err)
-          })
-      }
-      
-
-
       this.getAllUsername()
       this.getAllNickname()
-      this.credentials.profile_path = this.$store.state.loginUser_profile_path
+      this.setProfilePath(this.loginUser_profile_path)
     },
-    computed: {
+    computed:{
+      ...mapState([
+        'loginUser'
+      ]),
       checkValidUsername(){
         if (this.credentials.username.length > 0) {
-          let usedUsername = this.existingUsername.includes(this.credentials.username)
-        // let apples = this.selectedProducts.includes("Apples")
-        if (this.existingUsername.length > 0 && usedUsername) return true
-        // if (this.selectedProducts.length === 1 && (apples || pears)) return true
-        return false
+          let usedUsername = this.existingUsernames.includes(this.credentials.username)
+          if (this.existingUsernames.length > 0 && usedUsername) return true
+          return false
         } else {
           return false
         }
       },
       checkValidNickname(){
         if (this.credentials.nickname.length > 0) {
-          let usedNickname = this.existingNickname.includes(this.credentials.nickname)
-          if (this.existingNickname.length > 0 && usedNickname) return true
+          let usedNickname = this.existingNicknames.includes(this.credentials.nickname)
+          if (this.existingNicknames.length > 0 && usedNickname) return true
           return false
         } else {
           return false
         }
-        
       },
+      isLoggedIn: function () {
+        return (this.loginUser && this.loginUser.user_id)
+      },
+      nicknameNotice: function () {
+        return this.checkValidNickname ? '이미 사용중인 닉네임입니다.' : '사용 가능한 닉네임입니다.'
+      },
+      usernameNotice: function () {
+        return this.checkValidUsername ? '이미 사용중인 아이디입니다.' : '사용 가능한 아이디입니다.'
+      },
+      isValidForm: function () {
+        if (this.credentials.nickname && this.credentials.password && this.credentials.passwordConfirmation && (this.credentials.password === this.credentials.passwordConfirmation)) {
+          if (this.isLoggedIn) return true
+          else return this.credentials.username
+        }
+        return false
+      }
+      
     },
 }
 </script>
@@ -276,7 +287,7 @@ export default {
   }
 
   .click {
-    box-shadow: 0 0 0 0.9rem rgb(112,34,171, 0.5);
+    box-shadow: 0 0 0 0.9rem rgb(112, 34, 171);
   }
 
   .profile {
@@ -285,15 +296,19 @@ export default {
     object-fit: cover;
     border-radius: 50%;
     margin-right: 2rem;
+    cursor: pointer;
   }
 
   .page-title {
-    font-family: scd6;
-    font-size: 1.75rem;
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 192px 0 64px 0;
+    margin: 48px 0 64px 0;
+  }
+
+  .page-title > h1 {
+    font-family: scd6;
+    font-size: 1.75rem;
   }
 
   .line {
@@ -321,4 +336,20 @@ export default {
     border: none;
     background-color: rgb(255, 139, 139);
   }
+
+  #custom-checkbox {
+    width: 12px;
+    height: 12px;
+    background-color: white;
+    border-radius: 2px;
+    margin-right: 2px;
+  }
+
+  #custom-checkbox.focus {
+    /* background-color: rgb(112,34,171); */
+    background: rgb(112,34,171) url('../assets/check.png')  no-repeat center center;
+    background-size: 80%;
+  }
+
+
 </style>

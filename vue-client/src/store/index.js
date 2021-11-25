@@ -6,18 +6,20 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    login: false,
     searchKeyword: '',
     selectedMovie: {},
     loginUser: {
-      user_id: '',
-      username: ''
-    },  // username과 user_id
-    loginUser_nickname: '',
-    loginUser_profile_path: 0,
+      id: '',
+      username: '',
+      nickname: '',
+      profile_path: 0,
+    },
+    isMyself: false,
   },
   mutations: {
     ON_SEARCH: function (state, searchKeyword) {
-      // console.log('mutations:onSearch', searchKeyword)
+      console.log('mutations:onSearch', searchKeyword)
       state.searchKeyword = searchKeyword
     },
     RESET_SEARCH_KEYWORD: function (state) {
@@ -26,20 +28,32 @@ export default new Vuex.Store({
     UPDATE_MOVIE_DETAIL: function (state, movieDetail) {
       state.selectedMovie = movieDetail
     },
-    STORE_LOGIN_USER: function (state, userInfo) {
-      state.loginUser = userInfo
+    GET_USER_INFO: function (state, info) {
+      state.loginUser.id = info.id
+      state.loginUser.username = info.username
+      state.loginUser.nickname = info.nickname
+      state.loginUser.profile_path = info.profile_path
     },
     LOGOUT: function (state) {
-      state.loginUser = {}
+      state.login = false
+      state.loginUser = {
+        id: '',
+        username: '',
+        nickname: '',
+        profile_path: 0
+      }
     },
-    GET_USER_OTHERS: function (state, nickname, profile_path) {
-      state.loginUser_nickname = nickname
-      state.loginUser_profile_path = profile_path
+    LOGIN: function (state) {
+      state.login = true
+    },
+    UPDATE_IS_MYSELF: function (state, BOOL) {
+      state.isMyself = BOOL
     }
+
   },
   actions: {
     onSearch: function ({ commit }, searchKeyword) {
-      // console.log('actions:onSearch', searchKeyword)
+      console.log('actions:onSearch', searchKeyword)
       commit('ON_SEARCH', searchKeyword)
     },
     resetSearchKeyword: function ({ commit }) {
@@ -68,27 +82,35 @@ export default new Vuex.Store({
           const requestSimilar = responses[3].data
           const allDetails = {
             ...requestDetails,
-            Actor: requestActor,
-            Director: requestDirector,
-            Similar: requestSimilar
+            actors: requestActor,
+            directors: requestDirector,
+            similars: requestSimilar
           }
           commit('UPDATE_MOVIE_DETAIL', allDetails)
-          // console.log(allDetails)
         }))
         .catch(err => {
           console.log(err)
         })
       
     },
-    storeLoginUser: function ({ commit }, userInfo) {
-      commit('STORE_LOGIN_USER', userInfo)
+    getUserInfo: function ({ commit }, info) {
+      commit('GET_USER_INFO', info)
     },
     logout: function ({ commit }) {
       commit('LOGOUT')
     },
-    getUserOthers: function ({ commit }, nickname, profile_path) {
-      commit('GET_USER_OTHERS', nickname, profile_path)
+    login: function ({ commit }) {
+      commit('LOGIN')
     },
+    updateIsMySelf: function ({commit}, BOOL) {
+      console.log('update@@@@')
+      commit('UPDATE_IS_MYSELF', BOOL)
+    }
+  },
+  getters: {
+    loginUserId: state => {
+      return state.loginUser.user_id
+    }
   },
   modules: {
   }

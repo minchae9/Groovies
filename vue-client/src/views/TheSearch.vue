@@ -25,23 +25,15 @@ export default {
     },
     methods: {
         getSearchResult: function() {
-            // axios
             // 검색 결과 리스트 가져오기
-            // console.log('검색어:', this.keyword)
-
-            axios({
-                method: 'get', 
-                url: `http://127.0.0.1:8000/movies/search/${this.keyword}`
-            })
+            axios.get(`http://127.0.0.1:8000/movies/search/${this.keyword}`)
             .then(res => {
                 this.movieItems = res.data
             })
             .catch(err => {
                 console.log(err)
             })
-        }
-    },
-    computed: {
+        },
     },
     created: function () {
         if (this.keyword) {

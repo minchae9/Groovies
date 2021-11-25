@@ -1,10 +1,10 @@
 <template>
     <div class="movieListWrapper">
         <movie-modal></movie-modal>
-        <div class="movieList">
-            <movie-item v-for="(movieItem, index) in this.movieItems" :key="index" :movieItem="movieItem">
+        <ul class="movieList" v-if="movieItems">
+            <movie-item v-for="(movieItem, index) in movieItems" :key="index" :movieItem="movieItem">
             </movie-item>
-        </div>
+        </ul>
     </div>
 </template>
 
@@ -18,10 +18,6 @@ export default {
     props: {
         movieItems: Array,
     },
-    data: function () {
-        return {
-        }
-    },
 }
 </script>
 
@@ -30,14 +26,6 @@ export default {
         padding: 0;
         max-width: 1200px;
         margin: 0 auto;
-        /* text-align: left; */
-
-        /* overflow: auto; */
     }
-
-    /* .movieList::after {
-        content: "";
-        flex: auto;
-    } */
 
 </style>

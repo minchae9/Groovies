@@ -9,6 +9,9 @@ class MovieListSerializer(serializers.ModelSerializer):
 
         
 class CommentSerializer(serializers.ModelSerializer):
+    profile_path = serializers.IntegerField(read_only=True, source='user.profile_path')
+    username = serializers.CharField(read_only=True, source='user.username')
+    nickname = serializers.CharField(read_only=True, source='user.nickname')
 
     class Meta:
         model = Comment

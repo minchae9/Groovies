@@ -12,8 +12,6 @@
 </template>
 
 <script>
-// import { mapState } from 'vuex'
-
 export default {
     name: 'SearchBar',
     data: function () {
@@ -23,7 +21,7 @@ export default {
     },
     methods: {
         onSearch: function () {
-            if (this.searchKeyword && this.searchKeyword !== this.$route.params.keyword) {
+            if (this.searchKeyword && (this.searchKeyword !== this.$route.params.keyword)) {
                 this.$router.push({ name: 'Search', params: { keyword : this.searchKeyword }})
                 .then(() => {
                     const searchInput = document.querySelector('#SearchInput')
@@ -32,7 +30,6 @@ export default {
                 .catch((err)=>{
                     console.log(err)
                 })
-
             }
         },
         updateInput: function(event) {
@@ -51,9 +48,10 @@ export default {
             if (searchInput && value) searchInput.value = value
         },
         deep: true,
-        immediate: true,
+        immediate: true
       }
-    },  
+    },
+    
 }
 </script>
 

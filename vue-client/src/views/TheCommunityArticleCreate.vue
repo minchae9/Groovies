@@ -6,7 +6,7 @@
         <input v-model="article.title" type="text" id="title" style="width: 20rem;" placeholder="제목을 입력하세요">
         <div id="article-header">
           <div>
-            작성자: {{ userNickname }}
+            작성자: {{ loginUser.nickname ? loginUser.nickname : loginUser.username }} ({{ loginUser.username }})
           </div>
         </div>
       </div>
@@ -24,14 +24,18 @@
       </div>
       <div id="article-footer">
         <button v-if="this.$route.query.article > 0" @click="updateArticle">수정</button>
-        <button v-else @click="createArticle">작성</button>
+        <button v-else @click="createArticle" class="btn btn-primary">작성</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import axios from 'axios'
+
+const SERVER_URL = process.env.VUE_APP_SERVER_URL
+const AUTH_JWT_TOKEN = { Authorization : `JWT ${localStorage.getItem('jwt')}`}
 
 export default {
   name: 'CommunityArticleCreate',
@@ -42,19 +46,18 @@ export default {
         movie_title: '',
         content: '',
       },
-      userId: '',
-      username: '',
     }
   },
   methods: {
     createArticle: function () {
       axios({
         method: 'post',
-        url: 'http://127.0.0.1:8000/community/create/',
-        headers: { Authorization: `JWT ${localStorage.getItem('jwt')}`},
+        url: `${SERVER_URL}/community/create/`,
+        headers: AUTH_JWT_TOKEN,
         data: this.article
       })
         .then((res) => {
+          console.log(res)
           this.$router.push({ name: 'CommunityArticle', params: { article_id: res.data.id }})
         })
         .catch(err => {
@@ -64,8 +67,8 @@ export default {
     updateArticle: function () {
       axios({
         method: 'put',
-        url: `http://127.0.0.1:8000/community/${this.$route.query.article}/`,
-        headers: { Authorization: `JWT ${localStorage.getItem('jwt')}`},
+        url: `${SERVER_URL}/community/${this.$route.query.article}/`,
+        headers: AUTH_JWT_TOKEN,
         data: this.article
       })
         .then(res => {
@@ -89,7 +92,7 @@ export default {
       this.username = result.username
     }
     // 업데이트인 경우, 게시글 정보 받아오기
-    if (this.$route.query) {
+    if (this.$route.query.article) {
       // console.log(this.$route.query.article)
       axios({
         method: 'get',
@@ -107,83 +110,15 @@ export default {
     }
   },
   computed: {
-    userNickname: function () {
-      return this.$store.state.loginUser_nickname
-    },
+    ...mapState([
+      'login',
+      'loginUser',
+    ])
   }
 
 }
 </script>
 
 <style>
-  #community-article {
-    width: 70%;
-    max-width: 768px;
-    margin: 0 auto;
-  }
-
-  #article-body h1 {
-    font-size: 1.25rem;
-    font-weight: normal;
-    text-align: left;
-  }
-
-  #article-header {
-    display: flex;
-    padding: 1rem 0.5rem;
-    border-top: 1px solid rgb(165, 165, 165);
-    border-bottom: 1px solid rgb(165, 165, 165);
-    margin: 1rem 0;
-  }
-
-  #article-header > div:first-child {
-    flex-grow: 1;
-    text-align: left;
-    display: flex;
-    align-items: center;
-  }
-
-  #article-content-box {
-    margin-bottom: 2rem;
-  }
-
-  #article-content {
-    text-align: left;
-  }
-
-  #article-header > div:last-child > p {
-    margin-bottom: 0;
-  }
-
-  #article-footer {
-    display: flex;
-    padding: 1rem 0.5rem;
-    border-top: 1px solid rgb(165, 165, 165);
-    border-bottom: 1px solid rgb(165, 165, 165);
-    margin: 1rem 0;
-  }
-
-  .textarea {
-    width: 500px;
-    height: 200px;
-  }
-
-  .fa-heart {
-    color: crimson;
-    margin-right: 0.5rem;
-  }
-
-  .profile-img {
-    width: 30px;
-    height: 30px;
-    object-fit: cover;
-    border-radius: 50%;
-    margin-right: 0.5rem;
-  }
-
-  .comment-username {
-    font-family: scd6;
-    margin-right: 1rem;
-  }
 
 </style>

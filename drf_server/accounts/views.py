@@ -91,7 +91,7 @@ def show_cart(request):
             movies = movies | movie
         serializers = MovieListSerializer(movies, many=True)
         return Response(serializers.data)
-    return Response({'message': '찜하기로 첫 영화를 추가하세요!'}, status=status.HTTP_204_NO_CONTENT)
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 

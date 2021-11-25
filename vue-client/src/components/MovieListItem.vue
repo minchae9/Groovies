@@ -5,12 +5,11 @@
 </template>
 
 <script>
+
+const POSTER_URL = process.env.VUE_APP_POSTER_URL
+
 export default {
     name: 'MovieItem',
-    data: function () {
-        return {
-        }
-    },
     props: {
       movieItem: Object,
     },
@@ -21,10 +20,9 @@ export default {
     },
     computed: {
       poster_path: function () {
-        return (this.movieItem && this.movieItem.poster_path) ? `https://image.tmdb.org/t/p/original/${this.movieItem.poster_path}` : ''
+        return (this.movieItem && this.movieItem.poster_path) ? `${POSTER_URL}/${this.movieItem.poster_path}` : ''
       }
-    },
-
+    }
 }
 </script>
 
@@ -34,16 +32,7 @@ export default {
     display: inline-block;
     margin: 12px;
     cursor: pointer;
-
-    /* float: left;
-    position: relative; */
-    /* left: 50%;
-    transform: translateX(-50%); */
   }
-
-  /* .movieItem:last-child {
-    margin-right: auto;
-  } */
 
   .movieItem > img {
     height: 300px;

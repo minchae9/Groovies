@@ -12,14 +12,14 @@ import random
 @api_view(['GET'])
 def comment_list(request, movie_pk):
     if request.method == 'GET':
-        comments = get_list_or_404(Comment, movie=movie_pk)
+        comments = Comment.objects.filter(movie=movie_pk)
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
 # 댓글 조회, 수정, 삭제    
 @api_view(['GET', 'PUT', 'DELETE'])
 def comment_detail(request, movie_pk, comment_pk):
-    comment = get_object_or_404(Comment, pk=comment_pk, movie=movie_pk)
+    comment = Comment.objects.get(pk=comment_pk, movie=movie_pk)
     if request.method == 'GET':
         serializer = CommentSerializer(comment)
         return Response(serializer.data)
@@ -33,15 +33,12 @@ def comment_detail(request, movie_pk, comment_pk):
 
     elif request.method == 'DELETE':
         comment.delete()
-        data = {
-            'delete': f'댓글 {comment_pk}번이 삭제되었습니다.'
-        }
-        return Response(data, status=status.HTTP_204_NO_CONTENT)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 # 댓글 생성    
 @api_view(['POST'])
 def comment_create(request, movie_pk):
-    movie = get_object_or_404(Movie, pk=movie_pk)
+    movie = Movie.objects.get(pk=movie_pk)
     serializer = CommentSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         serializer.save(movie=movie, user=request.user)
@@ -51,7 +48,7 @@ def comment_create(request, movie_pk):
 # 한마디 좋아요
 @api_view(['POST'])
 def comment_like(request, movie_pk, comment_pk):
-    comment = get_object_or_404(Comment, pk=comment_pk)
+    comment = Comment.objects.get(pk=comment_pk)
     if comment.like_comment_users.filter(pk=request.user.pk).exists():
         comment.like_comment_users.remove(request.user)
         liked = False
@@ -67,7 +64,7 @@ def comment_like(request, movie_pk, comment_pk):
 # 영화 목록
 @api_view(['GET'])
 def movie_list(request):
-    movies = get_list_or_404(Movie)
+    movies = Movie.objects.all()
     serializer = MovieListSerializer(movies, many=True)
     return Response(serializer.data)
 
@@ -118,7 +115,7 @@ def rating(request, movie_pk):
                 return Response(serializer.data, status=status.HTTP_202_ACCEPTED) 
     else:
         if request.method == 'POST':
-            movie = get_object_or_404(Movie, pk=movie_pk)
+            movie = Movie.objects.get(pk=movie_pk)
             serializer = RatingSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save(movie=movie, user=request.user)
@@ -151,11 +148,12 @@ def recommendation(request):
             result = result | similar_movies   
     else:
         result = Movie.objects.all()
+    allmovies = Movie.objects.all()
     random_picked = random.sample(list(result), 15)
-    carousel_picked = random.sample(list(result), 5)
+    carousel_picked = random.sample(list(allmovies), 5)
     serializer1 = MovieListSerializer(random_picked, many=True)
     serializer2 = MovieSerializer(carousel_picked, many=True)
-    return Response({"recommendations": serializer1.data, "carousel_items": serializer2.data})
+    return Response({"recommendations": serializer1.data, "carouselItems": serializer2.data})
 
 
 # 찜하기
@@ -164,8 +162,8 @@ def add_cart(request, movie_pk):
     movie = Movie.objects.get(pk=movie_pk)
     if Cart.objects.filter(movie=movie, user=request.user).exists():
         Cart.objects.filter(movie=movie, user=request.user).delete()
-        return Response({'message': '찜한 목록에서 삭제되었습니다.'})
+        return Response(status=status.HTTP_204_NO_CONTENT)
     else:
         cart = Cart(movie=movie, user=request.user)
         cart.save()
-        return Response({'message': '찜한 목록에 추가되었습니다.'})
+        return Response(status=status.HTTP_201_CREATED)

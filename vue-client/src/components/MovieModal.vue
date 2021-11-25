@@ -9,7 +9,7 @@
             {{ selectedMovie.title }} ({{ selectedMovie.original_title }})
     
             <!-- cart button -->
-            <button @click="toggleCart" class="cart-button" :data-bs-dismiss="ratingModal" :aria-label="ratingClose">
+            <button :disabled="login === false" @click="toggleCart" class="cart-button" :data-bs-dismiss="ratingModal" :aria-label="ratingClose">
               <img src="@/assets/cart_add_2.svg" v-if="!isAddedToCart" alt="cart_add" class="cart-button-icon">
               <img src="@/assets/cart_remove.png" v-if="isAddedToCart" alt="cart_add" class="cart-button-icon">
             </button>
@@ -26,20 +26,6 @@
             
             <!-- average rate -->
             <span>평점 {{ selectedMovie.vote_average }}</span>
-            <!-- <span class="rating" @click="rate" :data-bs-dismiss="ratingModal" :aria-label="ratingClose">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 21.07 20.23"
-              v-for="(star_src, idx) in new Array(5)" :key="idx"
-              class="detail-star-icon" :data-score="Number(idx)+1">
-                  <defs>
-                  </defs>
-                  <g id="레이어_2" data-name="레이어 2">
-                  <g id="레이어_1-2" data-name="레이어 1">
-                  <path class="cls-1" 
-                  @click="rate" :data-bs-dismiss="ratingModal" :aria-label="ratingClose" :data-score="Number(idx)+1"
-                  :class="{ 'fullStar': idx < ratingScore }" 
-                  d="M11.81,1.29l2,4.05a1.44,1.44,0,0,0,1.07.78l4.47.65a1.42,1.42,0,0,1,.79,2.43l-3.23,3.15a1.41,1.41,0,0,0-.41,1.26l.76,4.45a1.42,1.42,0,0,1-2.06,1.5l-4-2.1a1.42,1.42,0,0,0-1.33,0l-4,2.1a1.42,1.42,0,0,1-2.07-1.5l.77-4.45a1.47,1.47,0,0,0-.41-1.26L.93,9.2a1.43,1.43,0,0,1,.79-2.43l4.47-.65a1.44,1.44,0,0,0,1.07-.78l2-4A1.43,1.43,0,0,1,11.81,1.29Z"/></g></g>
-              </svg>
-            </span> -->
           </div>
 
           <div>
@@ -64,10 +50,10 @@
               <img :src="poster_path" :alt="selectedMovie.title" class="poster">
               <div class="staffs">
                 <div>
-                  <span class="movie-info-left-title">감독</span> <span class="split-bar">|</span> {{ directors | getNames }}
+                  <span class="movie-info-left-title">감독</span> <span class="split-bar">|</span> {{ selectedMovie.directors | getNames }}
                 </div>
                 <div>
-                  <span class="movie-info-left-title">배우</span> <span class="split-bar">|</span> {{ actors | getNames }}
+                  <span class="movie-info-left-title">배우</span> <span class="split-bar">|</span> {{ selectedMovie.actors | getNames }}
                 </div>
               </div>
             </div>
@@ -86,6 +72,7 @@
           </button>
         </div>
 
+
       </div>
     </div>
   </div>
@@ -94,6 +81,10 @@
 <script>
 import axios from 'axios'
 import { mapState } from 'vuex'
+
+const AUTH_JWT_TOKEN = { Authorization : `JWT ${localStorage.getItem('jwt')}`}
+const POSTER_URL = process.env.VUE_APP_POSTER_URL
+const SERVER_URL = process.env.VUE_APP_SERVER_URL
 
 export default {
     name: 'MovieModal',
@@ -104,28 +95,19 @@ export default {
           ratingModal: '',
           ratingClose: '',
           ratingScore: 0,
-          directors: [],
-          actors: [],
         }
     },
     methods: {
       moveToDetail: function () {
         this.$router.push({ name: 'MovieDetail',  params: { movie_id: this.selectedMovie.id }})
       },
-      setToken: function () {
-        const token = localStorage.getItem('jwt')
-        const config = {
-          Authorization: `JWT ${token}`
-        }
-        return config
-      },
       toggleCart: function () {
-        if (this.loginUser && this.loginUser.user_id) {
+        if ((this.login === true) && (this.loginUser.id !== '')) {
           // 로그인한 사용자면
           axios({
             method: 'post',
-            url: `http://127.0.0.1:8000/movies/${this.selectedMovie.id}/cart/`,
-            headers: this.setToken()
+            url: `${SERVER_URL}/movies/${this.selectedMovie.id}/cart/`,
+            headers: AUTH_JWT_TOKEN
           })
           .then(() => {
             this.updateCartState()
@@ -133,52 +115,6 @@ export default {
           .catch(err => {
             console.log(err)
           })
-        } else {
-          this.$router.push({ name: 'Login' })
-        }
-      },
-      rate: function (event) {
-        if (this.loginUser && this.loginUser.user_id) {
-          // 로그인된 상태면
-          const targetScore = event.target.dataset.score
-
-          if (targetScore) {
-            // 별 눌렀을 때 (빈공간x)
-            if (this.ratingScore > 0) {
-              // 이미 줬던 점수가 있으면 -> 수정 (put)
-                axios({
-                  method: 'put',
-                  url: `http://127.0.0.1:8000/movies/${this.selectedMovie.id}/rating/`,
-                  headers: this.setToken(),
-                  data: { rate : targetScore },
-                })
-                .then(() => {
-                  this.updateRatingState()
-                })
-                .catch(err => {
-                  console.log(err)
-                })
-  
-            } else {
-              // 준 점수가 없으면 -> 새로 등록 (post)
-              axios({
-                method: 'post',
-                url: `http://127.0.0.1:8000/movies/${this.selectedMovie.id}/rating/`,
-                headers: this.setToken(),
-                data: { rate : targetScore },
-              })
-              .then(() => {
-                this.updateRatingState()
-              })
-              .catch(err => {
-                console.log(err)
-              })
-            }
-          }
-
-        } else {
-          // 로그인을 안했으면
-          this.$router.push({ name: 'Login' })
         }
       },
       moveToSearch: function (genre) {
@@ -186,50 +122,23 @@ export default {
         this.$store.dispatch('onSearch', genre)
       },
       updateCartState: function () {
-        // cart data
-        axios({
-          method: 'get',
-          url: `http://127.0.0.1:8000/accounts/mycart/`,
-          headers: this.setToken()
-        })
-        .then((res) => {
-          this.myCart = res.status === 204? [] : res.data
-          this.isAddedToCart =  this.myCart.map(item => item.id).includes(this.selectedMovie.id) ? true : false
-        })
-        .catch(err => {
-          console.log(err)
-        })
-      },
-      updateRatingState: function () {
-        // cart data
-        axios({
-          method: 'get',
-          url: `http://127.0.0.1:8000/movies/${this.selectedMovie.id}/rating/`,
-          headers: this.setToken()
-        })
-        .then((res) => {
-          this.ratingScore = ((res.status >= 200 && res.status <= 202) && res.data.rate) ? res.data.rate : 0
-        })
-        .then(() => {
-          const stars = document.querySelectorAll('.detail-star-icon')
-          stars.forEach((item, idx) => {
-            if (idx < this.ratingScore) {
-              item.classList.add('fullStar')
-            } else {
-              item.classList.remove('fullStar')
-            }
+        if ((this.login === true) && (this.loginUser.id !== '')) {
+          axios({
+            method: 'get',
+            url: `${SERVER_URL}/accounts/mycart/`,
+            headers: AUTH_JWT_TOKEN
           })
-        })
-        .catch(err => {
-          if (err.response.status === 404) {
-            this.ratingScore = 0
-          } else {
+          .then((res) => {
+            this.myCart = res.status === 204? [] : res.data
+            this.isAddedToCart =  this.myCart.map(item => item.id).includes(this.selectedMovie.id) ? true : false
+          })
+          .catch(err => {
             console.log(err)
-          }
-        })
+          })
+        }
       },
       updateLoginState: function () {
-        if (this.loginUser && this.loginUser.user_id) {
+        if ((this.login === true) && (this.loginUser.id !== '')) {
           //ratings 버튼
           this.ratingModal = ''
           this.ratingClose = ''
@@ -240,38 +149,11 @@ export default {
         }
       },
       updateStates: function () {
-        this.updateLoginState(this.loginUser)
-
-        // 로그인한 경우만 로그인 정보 업데이트
-        if (this.loginUser && this.loginUser.user_id) {
+        this.updateLoginState()
+        if ((this.login === true) && (this.loginUser.id !== '')) {
           this.updateCartState()
-          this.updateRatingState()
         }
       },
-      getDirectors: function () {
-        axios({
-          method: 'get',
-          url: `http://127.0.0.1:8000/movies/${this.selectedMovie.id}/director/`,
-        })
-        .then((res) => {
-          this.directors = res.data
-        })
-        .catch(err => {
-          console.log(err)
-        })
-      },
-      getActors: function () {
-        axios({
-          method: 'get',
-          url: `http://127.0.0.1:8000/movies/${this.selectedMovie.id}/actor/`,
-        })
-        .then((res) => {
-          this.actors = res.data
-        })
-        .catch(err => {
-          console.log(err)
-        })
-      }
     },
     filters: {
       convertToTime: function (num) {
@@ -283,19 +165,22 @@ export default {
         return string ? string.slice(0,4) : ''
       },
       getNames: function (arr) {
-        return arr.map(person => person.name).join(', ')
-      }
+        if (arr) {
+          return arr.map(person => person.name).join(', ')
+        }
+      },
     },
     computed: {
       ...mapState([
         'selectedMovie',
-        'loginUser'
+        'loginUser',
+        'login'
       ]),
       trailer_src: function () {
         return this.selectedMovie.trailer_key ? `https://www.youtube.com/embed/${this.selectedMovie.trailer_key}`: ''
       },
       poster_path: function () {
-        return this.selectedMovie.poster_path ? `https://image.tmdb.org/t/p/original/${this.selectedMovie.poster_path}`: ''
+        return this.selectedMovie.poster_path ? `${POSTER_URL}/${this.selectedMovie.poster_path}`: ''
       },
       splited_genres: function () {
         return this.selectedMovie.genres ? this.selectedMovie.genres.split(', ') : []
@@ -307,9 +192,6 @@ export default {
       },
       selectedMovie: function () {
         this.updateStates()
-
-        this.getDirectors()
-        this.getActors()
       },
     },
     created: function () {
@@ -517,6 +399,7 @@ export default {
     padding: 2rem;
     padding-bottom: 0;
   }
+
 
   /* star */
   .cls-1{fill:none;stroke:#fbb03b;stroke-linecap:round;stroke-miterlimit:10;}
