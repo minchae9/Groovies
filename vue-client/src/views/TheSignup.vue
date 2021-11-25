@@ -221,7 +221,7 @@ export default {
     created: function () {
       this.getAllUsername()
       this.getAllNickname()
-      this.setProfilePath(this.loginUser_profile_path)
+      this.setProfilePath(this.loginUser.profile_path)
     },
     computed:{
       ...mapState([
