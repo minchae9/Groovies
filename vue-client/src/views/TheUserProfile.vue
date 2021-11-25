@@ -110,10 +110,8 @@ export default {
     deleteAccount: function () {
       axios.delete(`${SERVER_URL}/accounts/profile/${this.userId}/delete/`)
         .then(() => {
-          this.$store.dispatch('logout')
-        })
-        .then(() => {
           sessionStorage.removeItem('profilepath')
+          this.$store.dispatch('logout')
         })
         .then(() => {
           this.$router.push({ name: 'Home' })
@@ -227,7 +225,7 @@ export default {
 </script>
 
 <style>
-  #user-content-box {
+  #article-content-box {
     width: 70%;
     margin: 0 auto;
   }
@@ -258,10 +256,5 @@ export default {
     margin-bottom: 1rem;
   }
 
-  #account-delete-button {
-    color: gray; 
-    margin-top: 3rem; 
-    display: inline-block;
-  }
 
 </style>

@@ -251,6 +251,10 @@ export default {
     padding-bottom: 0.5rem;
   }
 
+  .rating {
+    cursor: pointer;
+  }
+
   .genre-button {
     background-color: rgb(112,34,171);
     margin: 0.25rem;
