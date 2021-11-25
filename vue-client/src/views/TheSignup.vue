@@ -85,7 +85,7 @@ export default {
             username: '',
             password: '',
             passwordConfirmation: '',
-            profile_path: sessionStorage.getItem('profilepath'),
+            profile_path: sessionStorage.getItem('profilepath') || (this.loginUser && this.loginUser.profile_path) || 0,
           },
           isInvalidPW: false,
           isNotSamePW: false,

@@ -114,6 +114,8 @@ export default {
         })
         .then(() => {
           sessionStorage.removeItem('profilepath')
+        })
+        .then(() => {
           this.$router.push({ name: 'Home' })
         })
         .catch(err => {
