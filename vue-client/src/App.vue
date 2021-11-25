@@ -16,7 +16,7 @@
         <b>{{ loginUserNickname }}</b>님 환영합니다.
       </div>
       <div v-if="login">
-        <router-link v-if="login" :to="{ name: 'UserProfile', params: { user_id: userId }}">마이페이지</router-link> |
+        <router-link v-if="login" :to="{ name: 'UserProfile', query: { userid: userId }}">마이페이지</router-link> |
         <router-link to="#" @click.native="logout">로그아웃</router-link>
       </div>
 
@@ -49,7 +49,6 @@ export default {
     // 현재 로그인한 유저 정보 받기
     getUserBasics: function () {
         if (localStorage.getItem('jwt')) {
-        // 유저 정보 추출
         const JWTtoken = localStorage.getItem('jwt')
         const base64Payload = JWTtoken.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE 
         const payload = Buffer.from(base64Payload, 'base64'); 
@@ -70,7 +69,7 @@ export default {
   },
   created: function () {
     const token = localStorage.getItem('jwt')
-    // 토큰이 있다면 this.login을 true로 변경
+
     if (token) {
       this.$store.dispatch('login')
       this.getUserBasics()
@@ -91,9 +90,6 @@ export default {
     $route (to, from){
         if (to.name ==='Search' && from.name === 'Home') {
           this.$store.dispatch('onSearch', this.$route.params.keyword) 
-        }
-        if (to.name === 'UserProfile') {
-          this.$store.dispatch('updateIsMySelf', this.$store.getters.loginUserId === Number(this.$route.params.user_id))
         }
     }
   },

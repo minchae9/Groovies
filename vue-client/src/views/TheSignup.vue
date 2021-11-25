@@ -18,7 +18,7 @@
       <br>
       <div>
         <label for="nickname">닉네임:</label>
-        <input v-if="isLoggedIn" type="text" id="nickname" :value="credentials.nickname" @input="onInputNickname" :class="{ red: !checkValidNickname }" :placeholder="this.$store.state.loginUser_nickname">
+        <input v-if="login === true" type="text" id="nickname" :value="credentials.nickname" @input="onInputNickname" :class="{ red: !checkValidNickname }" :placeholder="this.loginUser.nickname">
         <input v-else type="text" id="nickname" :value="credentials.nickname" @input="onInputNickname" :class="{ red: !checkValidNickname }">
         <p class="tag" v-if="credentials.nickname" v-show="checkValidNickname">사용 가능한 닉네임입니다.</p>
         <p class="tag invalid" v-if="credentials.nickname" v-show="!checkValidNickname">이미 사용중인 닉네임입니다.</p>
@@ -63,7 +63,7 @@ import axios from 'axios'
 import { mapState } from 'vuex'
 
 const SERVER_URL = process.env.VUE_APP_SERVER_URL
-const AUTH_JWT_TOKEN = process.env.VUE_APP_AUTH_JWT_TOKEN
+const AUTH_JWT_TOKEN = { Authorization : `JWT ${localStorage.getItem('jwt')}`}
 
 export default {
     name: 'Signup',
@@ -179,17 +179,18 @@ export default {
         if (this.credentials.nickname !== '') {
           axios({
             method: 'put',
-            url: `${SERVER_URL}/accounts/profile/${this.loginUser.user_id}/update/`,
+            url: `${SERVER_URL}/accounts/profile/${this.loginUser.id}/update/`,
             headers: AUTH_JWT_TOKEN,
             data: {
               profile_path: this.credentials.profile_path,
               nickname: this.credentials.nickname,
               password: this.credentials.password,
-              passwordConfirmation: this.credentials.passwordConfirmation
+              passwordConfirmation: this.credentials.passwordConfirmation,
+              username: this.loginUser.username
             }
           })
             .then(() => {
-              this.$router.push({ name: 'UserProfile', params: { user_id: this.loginUser.user_id }})
+              this.$router.push({ path: 'accounts', query: { userid: this.loginUser.id }})
             })
             .catch(err => {
               console.log(err)
@@ -197,17 +198,18 @@ export default {
         } else {
           axios({
             method: 'put',
-            url: `${SERVER_URL}/accounts/profile/${this.loginUser.user_id}/update/`,
+            url: `${SERVER_URL}/accounts/profile/${this.loginUser.id}/update/`,
             headers: AUTH_JWT_TOKEN,
             data: {
               profile_path: this.credentials.profile_path,
-              nickname: this.loginUser_nickname,
+              nickname: this.loginUser.nickname,
               password: this.credentials.password,
-              passwordConfirmation: this.credentials.passwordConfirmation
+              passwordConfirmation: this.credentials.passwordConfirmation,
+              username: this.loginUser.username
             }
           })
             .then(() => {
-              this.$router.push({ name: 'UserProfile', params: { user_id: this.loginUser.user_id }})
+              this.$router.push({ name: 'UserProfile', params: { user_id: this.loginUser.id }})
             })
             .catch(err => {
               console.log(err)

@@ -54,13 +54,13 @@ def update(request, profile_pk):
 		
 	#1-2. 패스워드 일치 여부 체크
     if password != password_confirmation:
-        return Response({'error': '비밀번호가 일치하지 않습니다.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
     #1-3. 닉네임 중복 여부 체크
     nickname = request.data.get('nickname')
     if nickname != user_info.nickname:
         if get_user_model().objects.filter(nickname=nickname).exists():
-            return Response({'error': '이미 사용중인 닉네임입니다.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
     #2. UserSerializer를 통해 데이터 직렬화
     serializer = UserSerializer(data=request.data, instance=user_info)
