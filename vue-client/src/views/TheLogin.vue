@@ -33,37 +33,24 @@ export default {
             username: '',
             password: '',
           },
-          token: null,
           error_message: '',
         }
     },
     methods: {
       login: function () {
-        // axios 요청 보내기
         axios.post(`http://127.0.0.1:8000/accounts/api-token-auth/`, this.credentials)
           .then((res) => {
-            // console.log(res)
             // 토큰을 로컬 저장소에 저장하기
             localStorage.setItem('jwt', res.data.token)
-            this.token = res.data.token
             
             this.$emit('getUserBasics')
-
-            // App.vue에 로그인됐음을 알림
-            // this.$emit('login')
             this.$store.dispatch('login')
-
             this.$router.push({ name: 'Home' })
           })
           .catch(() => {
-            // console.log(err)
             this.error_message = "로그인 정보가 틀렸습니다."
             this.credentials.password = ''
           })
-        // 유저 정보(아이디 정보)
-        
-
-
       }
     },
 }

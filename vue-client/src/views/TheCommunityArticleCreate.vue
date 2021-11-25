@@ -23,7 +23,7 @@
         </p>
       </div>
       <div id="article-footer">
-        <button v-if="this.$route.query.article > 0" @click="updateArticle">수정</button>
+        <button v-if="this.$route.query.article > 0" @click="updateArticle" class="btn btn-primary">수정</button>
         <button v-else @click="createArticle" class="btn btn-primary">작성</button>
       </div>
     </div>
@@ -57,7 +57,6 @@ export default {
         data: this.article
       })
         .then((res) => {
-          console.log(res)
           this.$router.push({ name: 'CommunityArticle', params: { article_id: res.data.id }})
         })
         .catch(err => {
@@ -80,26 +79,10 @@ export default {
     },
   },
   created: function () {
-    // 유저 정보 받아오기
-    if (localStorage.getItem('jwt')) {
-        // 유저 정보 추출
-      const JWTtoken = localStorage.getItem('jwt')
-      const base64Payload = JWTtoken.split('.')[1]; //value 0 -> header, 1 -> payload, 2 -> VERIFY SIGNATURE 
-      const payload = Buffer.from(base64Payload, 'base64'); 
-      const result = JSON.parse(payload.toString()) 
-      // console.log(result)
-      this.userId = result.user_id
-      this.username = result.username
-    }
     // 업데이트인 경우, 게시글 정보 받아오기
     if (this.$route.query.article) {
-      // console.log(this.$route.query.article)
-      axios({
-        method: 'get',
-        url: `http://127.0.0.1:8000/community/${this.$route.query.article}/`
-      })
+      axios.get(`http://127.0.0.1:8000/community/${this.$route.query.article}/`)
         .then(res => {
-          // console.log(res)
           this.article.title = res.data.title
           this.article.movie_title = res.data.movie_title
           this.article.content = res.data.content

@@ -1,7 +1,7 @@
 <template>
   <div id="signup">
     <div class="page-title">
-      <h1 v-if="isLoggedIn">회원 정보 수정</h1> 
+      <h1 v-if="login === true">회원 정보 수정</h1> 
       <h1 v-else>회원가입</h1> 
       <div class="line"></div>
     </div>
@@ -18,24 +18,18 @@
       <br>
       <div>
         <label for="nickname">닉네임:</label>
-        <input v-if="isLoggedIn" type="text" id="nickname" v-model="credentials.nickname" :class="{ red: checkValidNickname }" :placeholder="this.$store.state.loginUser_nickname">
-        <input v-else type="text" id="nickname" v-model="credentials.nickname" :class="{ red: checkValidNickname }">
-        <p class="tag" v-if="credentials.nickname" v-show="!checkValidNickname">사용 가능한 닉네임입니다.</p>
-        <p class="tag invalid" v-if="credentials.nickname" v-show="checkValidNickname">이미 사용중인 닉네임입니다.</p>
-
-        <!-- <input type="text" id="nickname" :value="credentials.nickname" @input="onInputNickname" :class="{ red: checkValidNickname }">
-        <p class="tag" :class="{ invalid : checkValidNickname }" v-if="credentials.nickname">{{ nicknameNotice }}</p> -->
+        <input v-if="isLoggedIn" type="text" id="nickname" :value="credentials.nickname" @input="onInputNickname" :class="{ red: !checkValidNickname }" :placeholder="this.$store.state.loginUser_nickname">
+        <input v-else type="text" id="nickname" :value="credentials.nickname" @input="onInputNickname" :class="{ red: !checkValidNickname }">
+        <p class="tag" v-if="credentials.nickname" v-show="checkValidNickname">사용 가능한 닉네임입니다.</p>
+        <p class="tag invalid" v-if="credentials.nickname" v-show="!checkValidNickname">이미 사용중인 닉네임입니다.</p>
 
       </div>
       <div>
         <label for="username">아이디:</label>
-        <input v-if="isLoggedIn" type="text" id="username" :value="loginUser.username" :class="{ red: checkValidUsername }" readonly disabled>
-        <input v-else type="text" id="username" v-model="credentials.username" :class="{ red: checkValidUsername }">
-        <p class="tag" v-if="credentials.username" v-show="!checkValidUsername">사용 가능한 아이디입니다.</p>
-        <p class="tag invalid" v-if="credentials.username" v-show="checkValidUsername">이미 사용중인 아이디입니다.</p>
-
-        <!-- <input type="text" id="username" :value="credentials.username" @input="onInputUsername" :class="{ red: checkValidUsername }">
-        <p class="tag" :class="{ invalid : checkValidUsername }" v-if="credentials.username">{{ usernameNotice }}</p> -->
+        <input v-if="login === true" type="text" id="username" :value="loginUser.username" :class="{ red: !checkValidUsername }" readonly disabled>
+        <input v-else type="text" id="username" :value="credentials.username" @input="onInputUsername" :class="{ red: !checkValidUsername }">
+        <p class="tag" v-if="credentials.username" v-show="checkValidUsername">사용 가능한 아이디입니다.</p>
+        <p class="tag invalid" v-if="credentials.username" v-show="!checkValidUsername">이미 사용중인 아이디입니다.</p>
       </div>
 
       <div>
@@ -51,14 +45,14 @@
       </div>
       <p class="notice" :class="{ shown: isNotSamePW }">비밀번호가 일치하지 않습니다!</p>
 
-      <div v-if="!isLoggedIn">
+      <div v-if="!login === true">
         <input type="checkbox" id="agree" style="display: none;">
         <label for="agree" style="cursor: pointer;">
           <div id="custom-checkbox" @click="toggleCheckBox"></div>
         </label>
         <label for="agree" style="cursor: pointer;" @click="toggleCheckBox">회원가입에 동의합니다!</label>
       </div>
-      <button v-if="isLoggedIn" @click="update" class="btn btn-primary" :disabled="!isValidForm">회원정보 수정</button>
+      <button v-if="login === true" @click="update" class="btn btn-primary" :disabled="!isValidForm">회원정보 수정</button>
       <button v-else @click="signup" class="btn btn-primary" :disabled="!isValidForm">회원가입</button>
     </div>
   </div>
@@ -67,6 +61,9 @@
 <script>
 import axios from 'axios'
 import { mapState } from 'vuex'
+
+const SERVER_URL = process.env.VUE_APP_SERVER_URL
+const AUTH_JWT_TOKEN = process.env.VUE_APP_AUTH_JWT_TOKEN
 
 export default {
     name: 'Signup',
@@ -78,11 +75,6 @@ export default {
             password: '',
             passwordConfirmation: '',
             profile_path: 0,
-          },
-          notice: {
-            nickname: '',
-            username: '',
-            password: '',
           },
           isInvalidPW: false,
           isNotSamePW: false,
@@ -107,11 +99,11 @@ export default {
       },
       signup: function () {
         const agreed = document.querySelector('#agree').checked
-        if (!this.checkValidUsername && !this.checkValidNickname && !this.isInvalidPW && !this.isNotSamePW && agreed) {
+        if (this.checkValidUsername && this.checkValidNickname && !this.isInvalidPW && !this.isNotSamePW && agreed) {
           // 회원가입 가능
           axios({
             method: 'post',
-            url: 'http://127.0.0.1:8000/accounts/signup/',
+            url: `${SERVER_URL}/accounts/signup/`,
             data: {
               profile_path: this.credentials.profile_path,
               nickname: this.credentials.nickname,
@@ -158,11 +150,7 @@ export default {
         }
       },
       getAllUsername: function () {
-        //axios
-        axios({
-          method: 'get',
-          url: 'http://127.0.0.1:8000/accounts/profile/'
-        })
+        axios.get(`${SERVER_URL}/accounts/profile/`)
           .then(res => {
             const userList = []
             for (let i=0; i < res.data.length ; i++) {
@@ -175,11 +163,7 @@ export default {
           })
       },
       getAllNickname: function () {
-        //axios
-        axios({
-          method: 'get',
-          url: 'http://127.0.0.1:8000/accounts/profile/'
-        })
+        axios.get(`${SERVER_URL}/accounts/profile/`)
           .then(res => {
             const userList = []
             for (let i=0; i < res.data.length ; i++) {
@@ -192,12 +176,11 @@ export default {
           })
       },
       update: function () {
-        //axios
         if (this.credentials.nickname !== '') {
           axios({
             method: 'put',
-            url: `http://127.0.0.1:8000/accounts/profile/${this.loginUser.user_id}/update/`,
-            headers: { Authorization: `JWT ${localStorage.getItem('jwt')}` },
+            url: `${SERVER_URL}/accounts/profile/${this.loginUser.user_id}/update/`,
+            headers: AUTH_JWT_TOKEN,
             data: {
               profile_path: this.credentials.profile_path,
               nickname: this.credentials.nickname,
@@ -214,8 +197,8 @@ export default {
         } else {
           axios({
             method: 'put',
-            url: `http://127.0.0.1:8000/accounts/profile/${this.loginUser.user_id}/update/`,
-            headers: { Authorization: `JWT ${localStorage.getItem('jwt')}` },
+            url: `${SERVER_URL}/accounts/profile/${this.loginUser.user_id}/update/`,
+            headers: AUTH_JWT_TOKEN,
             data: {
               profile_path: this.credentials.profile_path,
               nickname: this.loginUser_nickname,
@@ -240,38 +223,30 @@ export default {
     },
     computed:{
       ...mapState([
-        'loginUser'
+        'loginUser',
+        'login'
       ]),
       checkValidUsername(){
         if (this.credentials.username.length > 0) {
           let usedUsername = this.existingUsernames.includes(this.credentials.username)
-          if (this.existingUsernames.length > 0 && usedUsername) return true
-          return false
+          if (this.existingUsernames.length > 0 && usedUsername) return false
+          return true
         } else {
-          return false
+          return true
         }
       },
       checkValidNickname(){
         if (this.credentials.nickname.length > 0) {
           let usedNickname = this.existingNicknames.includes(this.credentials.nickname)
-          if (this.existingNicknames.length > 0 && usedNickname) return true
-          return false
+          if (this.existingNicknames.length > 0 && usedNickname) return false
+          return true
         } else {
-          return false
+          return true
         }
       },
-      isLoggedIn: function () {
-        return (this.loginUser && this.loginUser.user_id)
-      },
-      nicknameNotice: function () {
-        return this.checkValidNickname ? '이미 사용중인 닉네임입니다.' : '사용 가능한 닉네임입니다.'
-      },
-      usernameNotice: function () {
-        return this.checkValidUsername ? '이미 사용중인 아이디입니다.' : '사용 가능한 아이디입니다.'
-      },
       isValidForm: function () {
-        if (this.credentials.nickname && this.credentials.password && this.credentials.passwordConfirmation && (this.credentials.password === this.credentials.passwordConfirmation)) {
-          if (this.isLoggedIn) return true
+        if (this.credentials.password && this.credentials.passwordConfirmation && (this.credentials.password === this.credentials.passwordConfirmation)) {
+          if (this.login === true) return true
           else return this.credentials.username
         }
         return false

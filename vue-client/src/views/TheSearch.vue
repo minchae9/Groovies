@@ -12,6 +12,8 @@ import SearchBar from '../components/SearchBar.vue'
 import MovieList from '../components/MovieList.vue'
 import axios from 'axios'
 
+const SERVER_URL = process.env.VUE_APP_SERVER_URL
+
 export default {
   components: { SearchBar, MovieList },
     name: 'Search',
@@ -26,7 +28,7 @@ export default {
     methods: {
         getSearchResult: function() {
             // 검색 결과 리스트 가져오기
-            axios.get(`http://127.0.0.1:8000/movies/search/${this.keyword}`)
+            axios.get(`${SERVER_URL}/movies/search/${this.keyword}`)
             .then(res => {
                 this.movieItems = res.data
             })

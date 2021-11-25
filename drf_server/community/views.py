@@ -31,16 +31,9 @@ def article_detail(request, article_pk):
     if request.method == 'GET':
         serializer = ArticleSerializer(article)
         return Response(serializer.data)
-    if not request.user.article_set.filter(pk=article_pk).exists():
-        return Response({'error': '권한이 없습니다.'})
-
-    if request.method == 'DELETE':
+    elif request.method == 'DELETE':
         article.delete()
-        data = {
-            'delete': f'{article_pk}번 게시글이 삭제되었습니다.'
-        }
-        return Response(data, status=status.HTTP_204_NO_CONTENT)
-
+        return Response(status=status.HTTP_204_NO_CONTENT)
     elif request.method == 'PUT':
         serializer = ArticleSerializer(article, data=request.data)
         if serializer.is_valid(raise_exception=True):
@@ -50,17 +43,18 @@ def article_detail(request, article_pk):
 
 # 게시글 좋아요
 @api_view(['GET', 'POST'])
-def article_like(request, article_pk, user_pk):
+def article_like(request, article_pk):
     article = Article.objects.get(pk=article_pk)
     if request.method == 'GET':
-        if article.like_article_users.filter(pk=user_pk).exists():
+        if article.like_article_users.filter(pk=request.user.pk).exists():
             liked = True
         else:
             liked = False
         like_status = {
             'liked': liked, # 좋아요 여부
+            'count': article.like_article_users.count(),
         }
-        return Response(like_status)
+        return Response(like_status, status=status.HTTP_200_OK)
     elif request.method == 'POST':
         if article.like_article_users.filter(pk=request.user.pk).exists():
             article.like_article_users.remove(request.user)

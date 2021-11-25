@@ -7,7 +7,7 @@
           <div>
             <img v-if="article.profile_path >= 0" :src="require(`@/assets/profile_img_${article.profile_path}.jpg`)" 
             class="profile-img" alt="profile_img">
-            <span class="article-list-item-user" @click="moveToUserProfile(article.user)">{{ article.nickname }} ({{ article.username }})</span>
+            <span class="article-list-item-user" @click="moveToUserProfile(article.user)">{{ article.nickname }}</span>
           </div>
           <div>
             <p>작성  |  {{ article.created_at | convertFormat }}</p>
@@ -29,10 +29,15 @@
         </div>
       </div>
 
-        <button :disabled="login === false" id="like-button" @click="toggleLike">
+        <button v-if="login === true" id="like-button" @click="toggleLike">
           <i class="fa-heart" :class="[{ fas: likeState }, { far: !likeState }]"></i>
           <span>{{likeUsersCount}}</span>
         </button>
+        <button v-else id="like-button" @click="toggleLike" disabled>
+          <i class="fa-heart far"></i>
+          <span>{{likeUsersCount}}</span>
+        </button>
+        
         <comment 
         :comments="comments"
         :targetId="article.id"
@@ -67,11 +72,11 @@ export default {
         this.$router.push({ name: 'UserProfile', params: { user_id: user_id }})
       },
       toggleLike: function () {
-        if ((this.login === true) && (this.loginUser.id !== '')) return
-        // 좋아요 정보 저장하기
+        if ((this.login === true) && (this.loginUser.id !== '')) {
+          // 좋아요 정보 저장하기
         axios({
           method: 'post',
-          url: `${SERVER_URL}/community/${this.article.id}/like/${this.userInfo.user_id}/`,
+          url: `${SERVER_URL}/community/${this.article.id}/like/`,
           headers: AUTH_JWT_TOKEN
         })
           .then(() => {})
@@ -90,9 +95,15 @@ export default {
             this.likeUsersCount++
           }
         }
+        }
+        
       },
       getLikeState: function (article_id) {
-        axios.get(`${SERVER_URL}/community/${article_id}/like/${this.loginUser.id}/`)
+        axios({
+          method: 'get',
+          url: `${SERVER_URL}/community/${article_id}/like/`,
+          headers: AUTH_JWT_TOKEN
+        })
           .then(res => {
             this.likeState = res.data.liked
             this.likeUsersCount = res.data.count
@@ -120,24 +131,18 @@ export default {
     },
     created: function () {
       const article_id = this.$route.params.article_id
-      // axios
+      // 게시글 내용, 좋아요 수
       axios.get(`${SERVER_URL}/community/${article_id}`)
         .then(res => {
-          console.log(res)
           this.article = res.data
           this.likeUsersCount = res.data.like_article_users.length
         })
         .catch(err => {
           console.log(err)
         })
-      
       // 댓글
-      axios({
-        method: 'get',
-        url: `http://127.0.0.1:8000/community/${article_id}/comment/`
-      })
+      axios.get(`${SERVER_URL}/community/${article_id}/comment/`)
       .then(res => {
-        // console.log(res)
         this.comments = res.data
       })
       .catch(err => {

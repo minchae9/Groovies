@@ -9,8 +9,8 @@
                 <img :src="require(`@/assets/profile_img_${comment.profile_path}.jpg`)" 
                 class="profile-img comment-profile-img" alt="profile_img">
               </div>
-              <div class="comment-username">{{ comment.nickname }} 
-                <span>({{ comment.username }})</span>
+              <div class="comment-username">
+                {{ comment.nickname }} 
               </div>
               <div class="comment-content">{{ comment.content }}</div>
               <div class="comment-created-at">{{ comment.created_at | convertFormat }}</div>

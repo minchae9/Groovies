@@ -8,7 +8,7 @@
       </div>
 
       <div v-if="!login">
-        <router-link :to="{ name: 'Signup' }">회원가입</router-link> |
+        <router-link :to="{ name: 'Accounts' }">회원가입</router-link> |
         <router-link :to="{ name: 'Login' }">로그인</router-link>
       </div>
 
@@ -93,7 +93,7 @@ export default {
           this.$store.dispatch('onSearch', this.$route.params.keyword) 
         }
         if (to.name === 'UserProfile') {
-          this.$store.dispatch('updateIsMySelf', this.$store.getters.loginUserId === this.$route.params.user_id)
+          this.$store.dispatch('updateIsMySelf', this.$store.getters.loginUserId === Number(this.$route.params.user_id))
         }
     }
   },

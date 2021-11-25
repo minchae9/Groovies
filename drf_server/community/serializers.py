@@ -5,6 +5,7 @@ from accounts.serializers import UserSerializer
 class ArticleListSerializer(serializers.ModelSerializer):
     username = serializers.CharField(read_only=True, source='user.username')
     nickname = serializers.CharField(read_only=True, source='user.nickname')
+    
     class Meta:
         model = Article
         fields = ('id', 'title', 'user', 'created_at', 'username', 'nickname',)
@@ -14,6 +15,8 @@ class ArticleListSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     profile_path = serializers.IntegerField(read_only=True, source='user.profile_path')
     username = serializers.CharField(read_only=True, source='user.username')
+    nickname = serializers.CharField(read_only=True, source='user.nickname')
+
     class Meta:
         model = Comment
         fields = '__all__'
@@ -25,6 +28,7 @@ class ArticleSerializer(serializers.ModelSerializer):
     comment = CommentSerializer(many=True, read_only=True)
     username = serializers.CharField(read_only=True, source='user.username')
     nickname = serializers.CharField(read_only=True, source='user.nickname')
+
     class Meta:
         model = Article
         fields = '__all__'

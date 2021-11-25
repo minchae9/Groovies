@@ -9,17 +9,16 @@ export default new Vuex.Store({
     login: false,
     searchKeyword: '',
     selectedMovie: {},
+    isMyself: false,
     loginUser: {
       id: '',
       username: '',
       nickname: '',
       profile_path: 0,
     },
-    isMyself: false,
   },
   mutations: {
     ON_SEARCH: function (state, searchKeyword) {
-      console.log('mutations:onSearch', searchKeyword)
       state.searchKeyword = searchKeyword
     },
     RESET_SEARCH_KEYWORD: function (state) {
@@ -48,8 +47,7 @@ export default new Vuex.Store({
     },
     UPDATE_IS_MYSELF: function (state, BOOL) {
       state.isMyself = BOOL
-    }
-
+    },
   },
   actions: {
     onSearch: function ({ commit }, searchKeyword) {
@@ -102,10 +100,9 @@ export default new Vuex.Store({
     login: function ({ commit }) {
       commit('LOGIN')
     },
-    updateIsMySelf: function ({commit}, BOOL) {
-      console.log('update@@@@')
+    updateIsMySelf: function ({ commit }, BOOL) {
       commit('UPDATE_IS_MYSELF', BOOL)
-    }
+    },
   },
   getters: {
     loginUserId: state => {
