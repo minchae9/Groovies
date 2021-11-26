@@ -13,7 +13,10 @@
                 {{ comment.nickname }} 
               </div>
               <div class="comment-content">{{ comment.content }}</div>
-              <div class="comment-created-at">{{ comment.created_at | convertFormat }}</div>
+              <div class="comment-time">
+                <div class="comment-created-at">{{ comment.created_at | convertFormat }}</div>
+                <div class="comment-created-at">{{ comment.updated_at | convertFormat }}</div>
+              </div>
               <button @click="deleteComment(comment)" 
               v-if="((login == true) && (comment.user == loginUser.id))" class="btn btn-secondary article-button">삭제</button>
             </li>
@@ -156,6 +159,12 @@ export default {
   .comment-created-at {
     display: flex;
     align-items: center;
+  }
+
+  .comment-time {
+    display:flex;
+    flex-direction: column;
+    margin-right: 1rem;
   }
 
   #comment-input-box {

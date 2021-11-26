@@ -14,7 +14,7 @@
       </div>
     </div>
     <hr>
-    <div id="article-content-box">
+    <div id="user-content-box">
 
       <div>
 
@@ -225,7 +225,7 @@ export default {
 </script>
 
 <style>
-  #article-content-box {
+  #user-content-box {
     width: 70%;
     margin: 0 auto;
   }
