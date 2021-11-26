@@ -23,7 +23,7 @@
             <p>영화: <b>《 {{ article.movie_title }} 》</b></p>
           </div>
 
-          <p id="article-content">
+          <p id="article-content" style="white-space:pre;">
             {{ article.content }}
           </p>
         </div>
@@ -196,11 +196,12 @@ export default {
   }
 
   #article-content-box {
-    margin-bottom: 2rem;
+    padding: 0 1rem;
   }
 
   #article-content {
     text-align: left;
+    width: 100%;
   }
 
   #article-header > div:last-child > p {

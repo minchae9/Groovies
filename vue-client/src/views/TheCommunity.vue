@@ -5,7 +5,7 @@
       <div class="line"></div>
     </div>
     <button v-if="login == true" @click="createArticle" class="btn btn-primary article-create-button">게시글 작성</button>  
-    <ul id="article-list" v-if="articleList && (articleList.length > 0)">
+    <ul id="article-list" v-if="articleList && (articleList.length > 0) && login==true">
       <li class="article-list-item" v-for="(articleListItem, index) in articleList" :key="index">
         <span class="article-list-item-title" 
         @click="moveToArticle(articleListItem.id)">
@@ -18,13 +18,16 @@
       </li>
       <!-- list -->
     </ul>
-    <div v-else style="margin-top: 8rem;">
-      <h6 v-if="login == true">첫 게시글을 남겨주세요!</h6>
-      <div v-else>
-        <h6>아직 게시글이 없어요.</h6>
-        <h6>로그인 후 첫 게시글을 남겨주세요!</h6>
-      </div>
+
+    <div v-else-if="login == true" class="community-notice">    <!-- 로그인은 했는데 글이 없을 때 -->
+      <h6 v-if="login == true">어서 첫 게시글을 남겨주세요!</h6>
     </div>
+
+    <div v-else class="community-notice">   <!-- 로그인을 안했을 때 -->
+      <h6>글을 보려면 로그인해주세요!</h6>
+      <button class="btn btn-primary" @click="moveToLogin" style="margin-top: 2rem;">로그인하러 가기</button>
+    </div>
+
   </div>
 </template>
 
@@ -44,6 +47,9 @@ export default {
     methods: {
       moveToArticle: function (article_id) {
         this.$router.push({ name: 'CommunityArticle', params: { article_id: article_id }})
+      },
+      moveToLogin: function () {
+        this.$router.push({ name: 'Login' })
       },
       moveToUserProfile: function (user_id) {
         this.$router.push({ name: 'UserProfile', params: { userid: user_id }})
@@ -78,6 +84,10 @@ export default {
 </script>
 
 <style>
+  .community-notice {
+    margin-top: 4rem;
+  }
+  
   #article-list {
     list-style: none;
     padding: 0;

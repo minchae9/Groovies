@@ -1,59 +1,75 @@
 <template>
   <div id="signup">
     <div class="page-title">
-      <h1 v-if="login == true">회원 정보 수정</h1> 
+      <h1 v-if="this.login == true">회원 정보 수정</h1> 
       <h1 v-else>회원가입</h1> 
       <div class="line"></div>
     </div>
     <div id="signup-form">
-      <div>
-        <p>프로필 사진</p>
-        <br>
+      <!-- profile img select -->
+      <div id="profile-img-select-box">
+        <p>마음에 드는 프로필 사진을 골라주세요</p>
         <img v-for="(x, idx) in new Array(5)" :key="idx"
-        :class="{ click: credentials.profile_path == idx }" 
+        :class="{ click: credentials.profile_path === idx }" 
         @click="setProfilePath(idx)" :src="require(`@/assets/profile_img_${idx}.jpg`)" 
         :alt="`${idx}번_프로필`" class="profile">
       </div>
-      <br>
-      <br>
-      <div>
-        <label for="nickname">닉네임:</label>
-        <input v-if="login == true" type="text" id="nickname" :value="credentials.nickname" @input="onInputNickname" :class="{ red: !checkValidNickname }" :placeholder="this.loginUser.nickname">
-        <input v-else type="text" id="nickname" :value="credentials.nickname" @input="onInputNickname" :class="{ red: !checkValidNickname }">
-        <p class="tag" v-if="credentials.nickname" v-show="checkValidNickname">사용 가능한 닉네임입니다.</p>
-        <p class="tag invalid" v-if="credentials.nickname" v-show="!checkValidNickname">이미 사용중인 닉네임입니다.</p>
 
-      </div>
-      <div>
-        <label for="username">아이디:</label>
-        <input v-if="login == true" type="text" id="username" :value="loginUser.username" :class="{ red: !checkValidUsername }" readonly disabled>
-        <input v-else type="text" id="username" :value="credentials.username" @input="onInputUsername" :class="{ red: !checkValidUsername }">
-        <p class="tag" v-if="credentials.username" v-show="checkValidUsername">사용 가능한 아이디입니다.</p>
-        <p class="tag invalid" v-if="credentials.username" v-show="!checkValidUsername">이미 사용중인 아이디입니다.</p>
+      <!-- input -->
+      <div id="signup-input-box">
+        <div id="signup-input-inputs">
+            <label class="signup-input-label" for="nickname">닉네임 <span class="split-bar">|</span></label>
+            <input v-if="this.login == true" type="text" id="nickname" :value="credentials.nickname" @input="onInputNickname" class="input-style" :class="{ red: !checkValidNickname }" :placeholder="this.$store.state.loginUser.nickname">
+            <input v-else type="text" id="nickname" :value="credentials.nickname" @input="onInputNickname" class="input-style" :class="{ red: !checkValidNickname }">
+            <div></div>   <!-- 자리 채우기용  -->
+            <div class="notice-box">
+              <p class="tag" v-if="credentials.nickname" v-show="checkValidNickname">사용 가능한 닉네임입니다.</p>
+              <p class="tag invalid" v-if="credentials.nickname" v-show="!checkValidNickname">이미 사용중인 닉네임입니다.</p>
+            </div>
+
+            <!-- <input type="text" id="nickname" :value="credentials.nickname" @input="onInputNickname" :class="{ red: checkValidNickname }">
+            <p class="tag" :class="{ invalid : checkValidNickname }" v-if="credentials.nickname">{{ nicknameNotice }}</p> -->
+
+            <label class="signup-input-label" for="username">아이디 <span class="split-bar">|</span></label>
+            <input v-if="this.login == true" type="text" id="username" :value="loginUser.username" class="input-style" :class="{ red: !checkValidUsername }" readonly disabled>
+            <input v-else type="text" id="username" :value="credentials.username" @input="onInputUsername" class="input-style" :class="{ red: !checkValidUsername }">
+            <div></div>   <!-- 자리 채우기용  -->
+            <div class="notice-box">
+              <p class="tag" v-if="credentials.username" v-show="checkValidUsername">사용 가능한 아이디입니다.</p>
+              <p class="tag invalid" v-if="credentials.username" v-show="!checkValidUsername">이미 사용중인 아이디입니다.</p>
+            </div>
+
+            <!-- <input type="text" id="username" :value="credentials.username" @input="onInputUsername" :class="{ red: checkValidUsername }">
+            <p class="tag" :class="{ invalid : checkValidUsername }" v-if="credentials.username">{{ usernameNotice }}</p> -->
+
+            <label class="signup-input-label" for="password">비밀번호 <span class="split-bar">|</span></label>
+            <input type="password" id="password" v-model="credentials.password" @input="[checkValidPW(), checkSamePW()]"
+            :class="{ red: isInvalidPW }" class="input-style">
+            <div></div>   <!-- 자리 채우기용  -->
+            <div class="notice-box">
+              <p class="tag">* 영문, 숫자를 모두 포함하여 8자리 이상</p>
+            </div>
+
+            <label class="signup-input-label" for="passwordConfirmation">비밀번호 확인 <span class="split-bar">|</span></label>
+            <input type="password" id="passwordConfirmation" v-model="credentials.passwordConfirmation" 
+            @input="[checkValidPW(), checkSamePW()]" :class="{ red: isNotSamePW }" class="input-style">
+            <div></div>   <!-- 자리 채우기용  -->
+            <div class="notice-box">
+              <p class="notice invalid" :class="{ shown: isNotSamePW }">비밀번호가 일치하지 않습니다!</p>
+            </div>
+        </div>
+
+        <div v-if="this.login !== true" class="agree-box">
+          <input type="checkbox" id="agree" style="display: none;">
+          <label for="agree" style="cursor: pointer;">
+            <div id="custom-checkbox" @click="toggleCheckBox"></div>
+          </label>
+          <label for="agree" style="cursor: pointer;" @click="toggleCheckBox">회원가입에 동의합니다!</label>
+        </div>
       </div>
 
-      <div>
-        <label for="password">비밀번호:</label>
-        <input type="password" id="password" v-model="credentials.password" @input="[checkValidPW(), checkSamePW()]"
-        :class="{ red: isInvalidPW }">
-        <p class="tag">* 영문, 숫자를 모두 포함하여 8자리 이상</p>
-      </div>
-      <div>
-        <label for="passwordConfirmation">비밀번호 확인:</label>
-        <input type="password" id="passwordConfirmation" v-model="credentials.passwordConfirmation" 
-        @input="[checkValidPW(), checkSamePW()]" :class="{ red: isNotSamePW }">
-      </div>
-      <p class="notice" :class="{ shown: isNotSamePW }">비밀번호가 일치하지 않습니다!</p>
-
-      <div v-if="!login == true">
-        <input type="checkbox" id="agree" style="display: none;">
-        <label for="agree" style="cursor: pointer;">
-          <div id="custom-checkbox" @click="toggleCheckBox"></div>
-        </label>
-        <label for="agree" style="cursor: pointer;" @click="toggleCheckBox">회원가입에 동의합니다!</label>
-      </div>
-      <button v-if="login == true" @click="update" class="btn btn-primary" :disabled="!isValidForm">회원정보 수정</button>
-      <button v-else @click="signup" class="btn btn-primary" :disabled="!isValidForm">회원가입</button>
+      <button v-if="this.login == true" @click="update" class="btn btn-primary signup-button" :disabled="!isValidForm">회원정보 수정</button>
+      <button v-else @click="signup" class="btn btn-primary signup-button" :disabled="!isValidForm">회원가입</button>
     </div>
   </div>
 </template>
@@ -74,7 +90,7 @@ export default {
             username: '',
             password: '',
             passwordConfirmation: '',
-            profile_path: sessionStorage.getItem('profilepath'),
+            profile_path: null,
           },
           isInvalidPW: false,
           isNotSamePW: false,
@@ -98,6 +114,7 @@ export default {
         this.credentials.username = event.target.value
       },
       signup: function () {
+        // console.log('signup!!')
         const agreed = document.querySelector('#agree').checked
         if (this.checkValidUsername && this.checkValidNickname && !this.isInvalidPW && !this.isNotSamePW && agreed) {
           // 회원가입 가능
@@ -113,9 +130,6 @@ export default {
             }
           })
             .then(() => {
-              sessionStorage.setItem('profilepath', this.credentials.profile_path)
-            })
-            .then(() => {
               this.$router.push({ name: 'Login' })
             })
             .catch(() => {
@@ -128,7 +142,6 @@ export default {
       setProfilePath (num) {
         this.credentials.profile_path = num
         this.clickedImg = num
-        sessionStorage.setItem('profilepath', num)
       },
       // 비밀번호
       checkValidPW: function () {
@@ -225,6 +238,8 @@ export default {
     created: function () {
       this.getAllUsername()
       this.getAllNickname()
+      // console.log(this.loginUser.profile_path)
+      this.setProfilePath(this.loginUser.profile_path)
     },
     computed:{
       ...mapState([
@@ -252,19 +267,51 @@ export default {
       isValidForm: function () {
         if (this.credentials.password && this.credentials.passwordConfirmation && (this.credentials.password === this.credentials.passwordConfirmation)) {
           if (this.login == true) return true
-          else return this.credentials.username
+          else return this.credentials.username ? true : false
         }
         return false
-      }
-      
+      },
     },
-  }
-
+}
 </script>
 
 <style>
+  .agree-box ,
+  .signup-button {
+    margin-top: 1rem;
+  }
+  #signup-input-box {
+    display: grid;
+  }
+
+  .signup-input-label {
+    display: block;
+    text-align: right;
+    margin-right: 0.5rem;
+  }
+
+  #signup-input-inputs {
+    text-align: left;
+    display: grid;
+    grid-template-columns: 8rem 16rem;
+    justify-content: center;
+    row-gap: 0.125rem;
+  }
+  
+  #signup-input-inputs input {
+    display: block;
+  }
+
+  #profile-img-select-box {
+    margin-bottom: 4rem;
+  }
+
+  #profile-img-select-box > p {
+    margin-bottom: 2rem;
+  }
+
   .invalid {
-    color: red;
+    color: rgb(255, 79, 79);
   }
 
   .click {
@@ -331,6 +378,5 @@ export default {
     background: rgb(112,34,171) url('../assets/check.png')  no-repeat center center;
     background-size: 80%;
   }
-
 
 </style>

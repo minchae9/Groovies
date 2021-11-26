@@ -42,6 +42,7 @@ export default {
   methods: {
     logout: function () {
         localStorage.removeItem('jwt')
+        localStorage.removeItem('profilepath')
         this.$store.dispatch('logout')
         this.$router.push({ name: 'Home' })
         this.$router.go()
@@ -75,7 +76,7 @@ export default {
       this.$store.dispatch('login')
       this.getUserBasics()
       this.getUserInfo()
-      sessionStorage.setItem('profilepath', this.loginUser.profile_path)
+      localStorage.setItem('profilepath', this.loginUser.profile_path)
     }
   },
   computed: {
@@ -133,6 +134,11 @@ export default {
      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-5Medium.woff') format('woff');
      font-weight: normal;
      font-style: normal;
+}
+
+.input-style {
+  border-radius: 4px;
+  border: 1px solid black;
 }
 
 /* override bootstrap */

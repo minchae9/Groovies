@@ -110,7 +110,7 @@ export default {
     deleteAccount: function () {
       axios.delete(`${SERVER_URL}/accounts/profile/${this.userId}/delete/`)
         .then(() => {
-          sessionStorage.removeItem('profilepath')
+          localStorage.removeItem('profilepath')
           this.$store.dispatch('logout')
         })
         .then(() => {
