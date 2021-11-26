@@ -6,6 +6,46 @@
 
 - TMDB API 사용
 
+- Django의 secret key를 노출하지 않기 위해 `.secrets.json` 파일로 분리하여 관리한다. 해당 파일은 프로젝트 폴더 안에 위치한다.
+
+  ```json
+  {
+      "SECRET_KEY": "DJANGO_SECRET_KEY_HERE"
+  }
+  ```
+
+  ```python
+  # settings.py의 SECRET KEY 위치
+  import os, json
+  from django.core.exceptions import ImproperlyConfigured
+  
+  
+  secret_file = os.path.join(BASE_DIR, 'secrets.json')
+  
+  with open(secret_file) as f:
+      secrets = json.loads(f.read())
+  
+  def get_secret(setting, secrets=secrets):
+      try:
+          return secrets[setting]
+      except KeyError:
+          error_msg = "Set the {} environment variable".format(setting)
+          raise ImproperlyConfigured(error_msg)
+  
+  SECRET_KEY = get_secret("SECRET_KEY")
+  ```
+
+- Vue에서 환경 변수를 관리하기 위해  `.env` 파일로 분리하여 관리하며, 이 또한 프로젝트 폴더 안에 위치한다.
+
+  본 프로젝트에서는 서버 url와 포스터 경로 url을 관리하고 있다.
+
+  ```
+  VUE_APP_SERVER_URL=http://127.0.0.1:8000
+  VUE_APP_POSTER_URL=https://image.tmdb.org/t/p/original
+  ```
+
+  
+
 ## 1. 팀원 정보 및 업무 분담 내역
 
 ### (1) 팀원 정보
@@ -168,7 +208,7 @@
   ![modal_detail](README.assets/modal_detail.png)
 
   * 앞서 작성한 와이어프레임을 바탕으로 실제 결과물이 어떤 느낌일지 파악하고 로고 디자인과 메인 컬러 등을 결정하기 위해 실제 예상 결과물의 모습을 간단하게 구현했다. 
-    * 이후 논의 끝에 주제별로 나뉘어 있던 추천영화 칸이 하나로 합쳐지게 됨
+    * 이후 논의 끝에 주제별로 나뉘어 있던 추천영화 칸이 하나로 합쳐지게 되었다.
 
 <br/>
 
